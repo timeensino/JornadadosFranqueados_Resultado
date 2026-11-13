@@ -1,2492 +1,945 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Escola Operacional 2026</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
-
-  <style>
-
-body {
-  font-family: Verdana, sans-serif;
-  background: #14532D;
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Controle orçamentário — Diretoria de Jornada dos Franqueados</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Public+Sans:wght@400;600;700&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#000000; --surface:#141A17; --ink:#E9F0EB; --muted:#9AA9A1; --line:#2C3A33; --soft:#1F2C26;
+  --basil:#5FC08F; --basil-soft:#1D3A2C; --tomato:#F0837A; --tomato-soft:#472320; --semola:#E3B454; --semola-soft:#3D3319;
+  --focus:#5FC08F;
+  --display:"Bricolage Grotesque","Trebuchet MS","Segoe UI",system-ui,sans-serif;
+  --body:"Public Sans","Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
-.logo-CPQ {
-
-  position: fixed;
-
-  top: 01px;
-  left: 100px;
-
-  width: 300px;
-
-  z-index: 999999;
-
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme:dark;
+    --bg:#000000; --surface:#141A17; --ink:#E9F0EB; --muted:#9AA9A1; --line:#2C3A33; --soft:#1F2C26;
+    --basil:#5FC08F; --basil-soft:#1D3A2C; --tomato:#F0837A; --tomato-soft:#472320; --semola:#E3B454; --semola-soft:#3D3319; --focus:#5FC08F; }
 }
-.container{
+:root[data-theme="dark"]{ color-scheme:dark;
+  --bg:#000000; --surface:#141A17; --ink:#E9F0EB; --muted:#9AA9A1; --line:#2C3A33; --soft:#1F2C26;
+  --basil:#5FC08F; --basil-soft:#1D3A2C; --tomato:#F0837A; --tomato-soft:#472320; --semola:#E3B454; --semola-soft:#3D3319; --focus:#5FC08F; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 20px 64px}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
 
-  max-width:1200px;
-  margin:30px auto;
+.topo{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between;padding-bottom:22px;border-bottom:2px solid var(--ink)}
+.topo h1{font-family:var(--display);font-weight:700;font-size:clamp(1.9rem,4.6vw,3rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+.topo p{margin:6px 0 0;color:var(--muted)}
+.base-info{text-align:right;font-size:.875rem;color:var(--muted);max-width:340px}
+.base-info strong{color:var(--ink);font-weight:600;overflow-wrap:anywhere}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--ink);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-weight:600;cursor:pointer;margin-top:10px}
+.btn:hover{opacity:.88}
+.btn.sec{background:transparent;color:var(--ink)}
+.btn[disabled]{opacity:.5;cursor:default}
 
-  background:white;
+.filtros{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-end;margin:22px 0 6px}
+.campo{display:flex;flex-direction:column;gap:6px;min-width:0}
+.campo > span{font-size:.8125rem;font-weight:600;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);padding:6px 11px;border-radius:999px;cursor:pointer;font-size:.875rem}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.chip.grupo{border-style:dashed}
+.chip.grupo[aria-pressed="true"]{border-style:solid}
+select{border:1px solid var(--line);background:var(--surface);padding:8px 12px;border-radius:10px;max-width:100%}
 
-  border-radius:30px;
+.resultado{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px;margin-top:26px;align-items:start}
+.quem{font-family:var(--display);font-weight:700;font-size:1.25rem;letter-spacing:-.01em;margin:0}
+.quem span{font-weight:400;color:var(--muted)}
+.veredito{font-family:var(--display);font-weight:700;line-height:1;letter-spacing:-.02em;margin:14px 0 0;display:flex;flex-direction:column;gap:4px}
+.veredito .vtipo{font-size:1.05rem;letter-spacing:0}
+.veredito .vvalor{font-size:clamp(2.4rem,6vw,3.6rem);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.veredito .vlinha{font-size:clamp(1.5rem,3.4vw,2.2rem);line-height:1.1}
+.veredito.bom{color:var(--basil)} .veredito.ruim{color:var(--tomato)}
+.vpct{display:inline-block;margin:12px 0 0;padding:5px 12px;border-radius:8px;background:var(--soft);font-size:.95rem}
+.vpct.bom{background:var(--basil-soft)} .vpct.ruim{background:var(--tomato-soft)}
+.vpct b{font-weight:700} .vpct[hidden]{display:none}
+.contexto{color:var(--muted);margin:8px 0 0;max-width:56ch}
+.base-nota{color:var(--muted);font-size:.8125rem;margin:12px 0 0}
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:20px 0 0;border-top:1px solid var(--line)}
+.trio div{padding:12px 14px 0 0}
+.trio dt{font-size:.8125rem;color:var(--muted)}
+.trio dd{margin:2px 0 0;font-size:1.3rem;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.destaques{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.destaques li{background:var(--surface);border-left:4px solid var(--line);padding:10px 14px;border-radius:0 10px 10px 0}
+.destaques li.bom{border-left-color:var(--basil)} .destaques li.ruim{border-left-color:var(--tomato)}
+.destaques small{display:block;color:var(--muted);font-size:.8125rem}
+.destaques b{font-weight:600}
 
-  padding:20px 70px 70px;
-
-  box-shadow:0 20px 60px rgba(0,0,0,.10);
-
+section{margin-top:40px}
+h2{font-family:var(--display);font-weight:700;font-size:1.35rem;letter-spacing:-.01em;margin:0 0 4px}
+.sub{color:var(--muted);font-size:.9rem;margin:0 0 14px;max-width:70ch}
+.painel{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.rolagem{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:10px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--soft)}
+th{font-size:.8125rem;font-weight:600;color:var(--muted);border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;white-space:normal;min-width:190px}
+td.num,th.num{font-variant-numeric:tabular-nums}
+tbody tr:last-child td{border-bottom:0}
+tr.total td{font-weight:700;border-top:2px solid var(--ink);border-bottom:0}
+tr.fora td{color:var(--muted)}
+tr.sel td{background:var(--soft)}
+.pos{color:var(--basil);font-weight:600} .neg{color:var(--tomato);font-weight:600}
+.linkrow{background:none;border:0;padding:0;cursor:pointer;text-align:left;font-weight:600;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.linkrow:hover{text-decoration-color:var(--ink)}
+.abre{background:none;border:0;padding:0;cursor:pointer;text-align:left;display:inline-flex;gap:8px;align-items:baseline;font-weight:600}
+.abre .seta{display:inline-block;width:.7em;color:var(--muted);transition:transform .15s}
+.abre[aria-expanded="true"] .seta{transform:rotate(90deg)}
+tr.conta td{background:var(--bg);font-size:.85rem;padding-top:7px;padding-bottom:7px}
+tr.conta td:first-child{padding-left:38px}
+td.regua-c{min-width:170px;width:22%}
+.regua{position:relative;height:14px;background:var(--soft);border-radius:3px}
+.regua i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--basil)}
+.regua.ruim i{background:var(--tomato)}
+.regua b{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1.5px;background:var(--semola);border-radius:2px}
+.legenda{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.8125rem;color:var(--muted);padding:10px 14px;border-top:1px solid var(--soft)}
+.legenda span{display:inline-flex;align-items:center;gap:6px}
+.legenda i{display:inline-block;width:14px;height:10px;border-radius:2px}
+.grafico{padding:14px 10px 4px;position:relative}
+.grafico svg{display:block;width:100%;height:auto;overflow:visible}
+.grafico text{font-family:var(--body);font-size:11px;fill:var(--muted)}
+.grafico .mes{cursor:pointer}
+.grafico .mes.fraco{opacity:.38}
+.grafico .mes:hover rect.alvo,.grafico .mes:focus rect.alvo{fill:var(--soft)}
+.grafico .mes:focus{outline:none}
+.dica{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);padding:8px 10px;border-radius:8px;font-size:.8125rem;line-height:1.35;white-space:nowrap;z-index:5;font-variant-numeric:tabular-nums}
+.dica[hidden]{display:none}
+.just-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:16px;align-items:start}
+.jcard{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--semola);border-radius:4px 4px 14px 14px;padding:16px 18px 18px;min-width:0}
+.jcard h3{font-family:var(--display);font-size:1.1rem;font-weight:700;margin:0;letter-spacing:-.01em}
+.jselo{display:inline-block;font-size:.8125rem;margin-top:4px}
+.jtxt{margin-top:10px;font-size:.9rem;overflow-wrap:anywhere}
+.jtxt h4{font-size:.9rem;font-weight:700;margin:14px 0 4px;padding-top:10px;border-top:1px solid var(--soft)}
+.jtxt h4:first-child{margin-top:0;padding-top:0;border-top:0}
+.jtxt p{margin:4px 0;max-width:75ch}
+.jtxt .jsub{font-weight:600;color:var(--muted);margin-top:10px}
+.jtxt .jval{font-weight:600;margin-top:8px}
+.jmais{margin-top:12px;background:none;border:0;padding:0;cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.jfiltros{display:flex;flex-wrap:wrap;gap:12px 20px;margin:0 0 16px}
+.jfiltros input{border:1px solid var(--line);background:var(--surface);padding:8px 12px;border-radius:10px;width:min(100%,260px)}
+.jper{font-family:var(--display);font-weight:700;font-size:.95rem;margin:18px 0 8px !important;padding:3px 10px;background:var(--semola-soft);border-radius:6px;display:inline-block}
+.jper:first-child{margin-top:0 !important}
+.jper + h4{margin-top:4px;padding-top:0;border-top:0}
+.jv{font-weight:600;color:var(--muted);white-space:nowrap}
+.jtxt .jb{font-weight:600;margin-top:8px}
+.jvazio{color:var(--muted);margin:0;padding:18px;border:1px dashed var(--line);border-radius:14px;max-width:70ch}
+details.confere{margin-top:40px;background:var(--semola-soft);border-radius:14px;padding:14px 18px}
+details.confere summary{cursor:pointer;font-weight:600}
+details.confere ul{margin:10px 0 2px;padding-left:20px}
+details.confere li{margin:6px 0;max-width:80ch}
+.nota{font-size:.8125rem;color:var(--muted);margin:10px 2px 0;max-width:80ch}
+.vazio{margin:48px 0;padding:44px 24px;border:2px dashed var(--line);border-radius:18px;text-align:center}
+.vazio h2{font-size:1.6rem}
+.vazio p{color:var(--muted);max-width:52ch;margin:8px auto 0}
+.solta .vazio{border-color:var(--basil);background:var(--basil-soft)}
+dialog{border:0;border-radius:16px;background:var(--surface);color:var(--ink);padding:24px;max-width:min(520px,calc(100vw - 32px));width:100%;box-shadow:0 18px 50px rgba(8,20,14,.35)}
+dialog::backdrop{background:rgba(8,20,14,.5)}
+dialog h2{margin-bottom:10px}
+dialog dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:12px 0}
+dialog dt{color:var(--muted)} dialog dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+dialog .acoes{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-top:18px}
+dialog .acoes .btn{margin-top:0}
+.erro{color:var(--tomato);font-weight:600}
+.aviso-leve{background:var(--semola-soft);padding:8px 12px;border-radius:8px;font-size:.875rem}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;z-index:20;max-width:calc(100vw - 32px)}
+.toast[hidden]{display:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:760px){
+  .resultado{grid-template-columns:1fr}
+  .base-info{text-align:left;max-width:none}
+  .trio dd{font-size:1.05rem}
+  th,td{padding:9px 10px}
+  th:first-child,td:first-child{min-width:132px}
+  tr.conta td:first-child{padding-left:26px}
 }
-
-h1 {
-
-  text-align: center;
-
-  font-size: 48px;
-
-  margin-bottom: 30px;
-
-  font-family:
-  'Noto Serif JP',
-  serif;
-
-  color: #1f3c5c;
-
-  letter-spacing: -2px;
-
-}
-
-    .termo-box {
-      background: #f8f9fa;
-      border-left: 6px solid #2e7d32;
-      padding: 30px;
-      border-radius: 15px;
-      line-height: 1.8;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .termo-buttons {
-      display: flex;
-      gap: 20px;
-      margin-top: 30px;
-    }
-
-    .btn {
-      flex: 1;
-      padding: 16px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .btn-aceito {
-      background: #2e7d32;
-      color: white;
-    }
-
-    .btn-nao {
-      background: #d32f2f;
-      color: white;
-    }
-
-    .formulario {
-      display: none;
-      margin-top: 40px;
-    }
-
-.form-grid {
-
-  display: flex;
-  gap: 50px;
-
-  align-items: flex-start;
-
-}
-
-
-/* =========================
-   NOVO LAYOUT DO FORMULÁRIO
-   ========================= */
-
-.evento-topo {
-  width: 100%;
-  margin-bottom: 35px;
-}
-
-.evento-titulo {
-  text-align: center;
-
-  /* Espaço entre o topo da página e o título */
-  margin-top: 35px;
-  margin-bottom: 30px;
-
-  /* Destaque do título */
-  background: #f8fbf9;
-  border: 2px solid #2E7D32;
-  border-radius: 22px;
-
-  padding: 22px 30px;
-
-  box-shadow: 0 6px 18px rgba(0,0,0,.06);
-}
-
-.evento-titulo h2 {
-  color: #1f3c5c;
-  font-size: 36px;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.evento-titulo .marca-evento {
-  color: #2E7D32;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.evento-titulo .ano-evento {
-  color: #1f3c5c;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.objetivo-evento {
-  background: #f5f7fa;
-  padding: 22px 28px;
-  border-radius: 16px;
-  margin-bottom: 25px;
-}
-
-.objetivo-evento strong {
-  font-size: 19px;
-}
-
-.objetivo-evento p {
-  margin: 10px 0 0;
-  font-size: 18px;
-  line-height: 1.7;
-}
-
-.info-evento {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-
-.info-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.info-card strong {
-  font-size: 18px;
-  color: #1f1f1f;
-}
-
-.info-card p {
-  margin-top: 10px;
-  margin-bottom: 0;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-.inscricao-area {
-  width: 100%;
-  background: #EAF5EC;
-  border-radius: 20px;
-  padding: 25px;
-  box-sizing: border-box;
-}
-
-.prazo-inscricao {
-  background: #fff3f3;
-  border: 2px solid #d62828;
-  border-radius: 16px;
-  padding: 16px 20px;
-  margin-bottom: 25px;
-  text-align: center;
-}
-
-.prazo-inscricao p {
-  color: #d62828;
-  font-size: 20px;
-  font-weight: bold;
-  margin: 0;
-  line-height: 1.5;
-}
-
-
-/* CELULAR */
-
-@media (max-width: 900px) {
-
-  .info-evento {
-    grid-template-columns: 1fr;
-  }
-
-  .evento-titulo h2 {
-    font-size: 30px;
-  }
-
-  .evento-titulo .marca-evento,
-  .evento-titulo .ano-evento {
-    font-size: 24px;
-  }
-
-  .objetivo-evento {
-    padding: 20px;
-  }
-
-  .info-card {
-    padding: 18px;
-  }
-
-  .inscricao-area {
-    padding: 15px;
-  }
-
-}
-    .mensagem {
-
-  background: #f8f9fa;
-  border-left: 6px solid #2e7d32;
-  padding: 30px;
-  border-radius: 18px;
-
-  line-height: 2;
-  font-size: 20px;
-
-  width: 100%;
-  box-sizing: border-box;
-
-  height: auto;
-  min-height: 420px;
-
-  overflow-wrap: break-word;
-
-}
-
-.form-direita {
-
-  flex: 1;
-
-}
-
-.mensagem-coluna {
-
-  flex: 1;
-
-}
-    input,
-    select {
-      width: 100%;
-      padding: 15px;
-      margin-top: 15px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      box-sizing: border-box;
-      font-size: 16px;
-    }
-
-    input[readonly] {
-      background: #eef5ff;
-      font-weight: bold;
-      color: #1f3c5c;
-    }
-
-    button.enviar {
-      width: 100%;
-      padding: 16px;
-      margin-top: 30px;
-      border: none;
-      border-radius: 10px;
-      background: #2e7d32;
-      color: white;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    h3 {
-      margin-top: 25px;
-      margin-bottom: 15px;
-      background: #eef5ff;
-      border-left: 5px solid #4a90e2;
-      padding: 14px 18px;
-      border-radius: 10px;
-      color: #1f3c5c;
-      font-size: 16px;
-      font-weight: bold;
-      line-height: 1.5;
-    }
-
-    .radio-group label {
-      display: block;
-      margin-top: 10px;
-    }
-
-    .radio-group input {
-      width: auto;
-      margin-right: 10px;
-    }
-
-@media (max-width: 900px) {
-
-  /* =========================
-     AJUSTES GERAIS DO CELULAR
-     ========================= */
-
-  * {
-    box-sizing: border-box;
-  }
-
-  html,
-  body {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-    margin: 0;
-  }
-
-
-  /* =========================
-     CAPA INICIAL
-     ========================= */
-
-  #capaInicial {
-    width: calc(100% - 20px) !important;
-    max-width: 100% !important;
-    min-height: calc(100vh - 20px) !important;
-
-    margin: 10px auto !important;
-
-    padding: 25px 18px 30px !important;
-
-    border-radius: 22px !important;
-
-    overflow: hidden;
-  }
-
-
-  /* Capa passa para uma coluna */
-
-  #capaInicial .capa-grid {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-
-    gap: 25px !important;
-
-    width: 100% !important;
-    max-width: 100% !important;
-
-    margin: 0 auto !important;
-  }
-
-
-  /* Impede qualquer coluna de estourar a tela */
-
-  #capaInicial .capa-grid > div {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-
-    box-sizing: border-box;
-  }
-
-
-  /* =========================
-     LOGO
-     ========================= */
-
-  #capaInicial .capa-grid img {
-    width: 190px !important;
-    max-width: 80% !important;
-    height: auto !important;
-
-    margin-bottom: 12px !important;
-  }
-
-
-  /* =========================
-     TÍTULO PRINCIPAL
-     ========================= */
-
-  #capaInicial h1 {
-    font-size: 38px !important;
-    line-height: 1.05 !important;
-
-    letter-spacing: -1px !important;
-
-    margin: 0 !important;
-
-    text-align: center !important;
-
-    overflow-wrap: break-word;
-  }
-
-
-  /* Casa do Pão de Queijo */
-
-  #capaInicial h1 span {
-    font-size: 27px !important;
-    line-height: 1.15 !important;
-  }
-
-
-  /* =========================
-     CAIXA DE INFORMAÇÕES
-     ========================= */
-
-  #capaInicial .capa-grid > div:last-child {
-    width: 100% !important;
-    max-width: 100% !important;
-
-    padding: 22px 18px !important;
-
-    border-radius: 18px !important;
-
-    box-sizing: border-box;
-  }
-
-
-  /* Bem-vindo */
-
-  #capaInicial .capa-grid > div:last-child p:first-child {
-    font-size: 19px !important;
-    line-height: 1.4 !important;
-  }
-
-
-  /* Textos da caixa */
-
-  #capaInicial .capa-grid > div:last-child p {
-    font-size: 16px !important;
-    line-height: 1.55 !important;
-  }
-
-
-  /* =========================
-     BOTÃO
-     ========================= */
-
-  #capaInicial button {
-    width: auto !important;
-    max-width: 100% !important;
-
-    padding: 14px 30px !important;
-
-    font-size: 17px !important;
-
-    white-space: nowrap;
-  }
-
-
-  /* =========================
-     FORMULÁRIO
-     ========================= */
-
-  .form-grid {
-    display: flex !important;
-    flex-direction: column !important;
-
-    gap: 25px !important;
-
-    width: 100% !important;
-    max-width: 100% !important;
-
-    box-sizing: border-box;
-  }
-
-
-  .mensagem-coluna,
-  .form-direita {
-    width: 100% !important;
-    max-width: 100% !important;
-
-    flex: none !important;
-
-    box-sizing: border-box;
-  }
-
-
-  .form-direita input,
-  .form-direita select {
-    width: 100% !important;
-    max-width: 100% !important;
-
-    box-sizing: border-box;
-  }
-
-
-  .mensagem {
-    width: 100% !important;
-    max-width: 100% !important;
-
-    padding: 22px !important;
-
-    font-size: 18px !important;
-
-    box-sizing: border-box;
-  }
-
-
-  .mensagem h2 {
-    font-size: 27px !important;
-  }
-
-
-  h3 {
-    font-size: 17px !important;
-  }
-
-}
-
-  </style>
-
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
 </head>
-
 <body>
-
-<div class="container" id="capaInicial" style="
-  min-height:calc(100vh - 60px);
-  box-sizing:border-box;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  margin:30px auto;
-  padding:35px 55px 35px;
-">
-
-  <!-- ÁREA PRINCIPAL -->
- <div class="capa-grid" style="
-  display:grid;
-  grid-template-columns:0.9fr 1.1fr;
-  gap:50px;
-  align-items:center;
-  width:100%;
-">
-
-    <!-- ESQUERDA: LOGO + TÍTULO -->
-    <div style="
-      text-align:center;
-    ">
-
-      <img
-        src="Logo CPQ.png"
-        style="
-          width:280px;
-          margin-bottom:15px;
-        "
-      >
-
-      <h1 style="
-        font-size:52px;
-        font-weight:700;
-        color:#1f3c5c;
-        letter-spacing:-2px;
-        line-height:1.1;
-        margin:0;
-      ">
-        Escola Operacional
-        <br>
-
-        <span style="
-          color:#2E7D32;
-          font-size:38px;
-        ">
-          Casa do Pão de Queijo
-        </span>
-
-        <span style="
-          color:#1f3c5c;
-          font-size:38px;
-        ">
-          | 2026
-        </span>
-      </h1>
-
+<div class="wrap">
+  <header class="topo">
+    <div>
+      <h1 id="titulo">Controle orçamentário</h1>
+      <p>Diretoria de Jornada dos Franqueados, orçado × realizado</p>
     </div>
-
-
-    <!-- DIREITA: INFORMAÇÕES -->
-    <div style="
-      background:#f5f7fa;
-      padding:30px;
-      border-radius:22px;
-      box-shadow:0 8px 25px rgba(0,0,0,.07);
-      text-align:center;
-    ">
-
-<p style="
-  margin:0;
-  font-size:24px;
-  color:#1f3c5c;
-  font-weight:600;
-  line-height:1.4;
-">
-  ☕ Bem-vindo(a) à experiência da Escola Operacional
-  <span style="color:#2E7D32;">
-    Casa do Pão de Queijo
-  </span>.
-</p>
-
-<hr style="
-  border:none;
-  border-top:1px solid #dfe3e8;
-  margin:22px 0;
-">
-
-<p style="
-  margin:0;
-  font-size:20px;
-  color:#555;
-  line-height:1.6;
-">
-  Desenvolvendo colaboradores para fortalecer a operação
-  e elevar a excelência em cada restaurante.
-</p>
-
-      <hr style="
-        border:none;
-        border-top:1px solid #dfe3e8;
-        margin:22px 0;
-      ">
-
-      <p style="
-        margin:0;
-        font-size:19px;
-        color:#555;
-        line-height:1.7;
-      ">
-        Uma jornada de aprendizado pensada para desenvolver
-        multiplicadores e elevar ainda mais o padrão de excelência
-        das nossas unidades da Casa do Pão de Queijo.
-        <br><br>
-
-        <strong>
-          Inscreva-se e participe do treinamento.
-        </strong>
-      </p>
-
+    <div class="base-info">
+      <div id="base-info"></div>
+      <button class="btn" id="btn-enviar" type="button" hidden>Abrir outro Excel nesta tela</button>
     </div>
+  </header>
 
+  <p id="carregando" class="contexto" style="margin-top:32px">Carregando a base…</p>
+
+  <div id="vazio" class="vazio" hidden>
+    <h2>Nenhuma base carregada ainda</h2>
+    <p>Coloque o Excel do controle orçamentário na mesma pasta do site, com o nome base.xlsx. Ou abra um arquivo agora para ver os resultados só neste navegador.</p>
+    <p id="vazio-leitor" hidden>Só quem é dono ou editor deste painel pode enviar a base.</p>
+    <button class="btn" id="btn-enviar-vazio" type="button">Abrir Excel</button>
   </div>
 
+  <main id="painel" hidden>
+    <div class="filtros">
+      <div class="campo"><span id="lb-per">Período</span><div class="chips" id="chips" role="group" aria-labelledby="lb-per"></div></div>
+      <label class="campo"><span>Centro de custo</span><select id="sel-cc"></select></label>
+    </div>
 
-  <!-- BOTÃO CENTRAL -->
-  <div style="
-    text-align:center;
-    margin-top:30px;
-  ">
-
-    <button
-      onclick="iniciarFormulario()"
-      style="
-        background:#14532D;
-        color:white;
-        border:none;
-        padding:16px 50px;
-        border-radius:15px;
-        font-size:20px;
-        font-weight:bold;
-        cursor:pointer;
-        box-shadow:0 10px 30px rgba(20,83,45,.30);
-        transition:.3s;
-      "
-    >
-      Iniciar inscrição
-    </button>
-
-  </div>
-
-</div>
-
-<div id="termo1" style="display:none; background:#EAF5EC; min-height:100vh; padding-top:30px;">
-  <div style="text-align:center;">
-
-    <h1 style="
-      display:inline-block;
-      background:white;
-      padding:20px 40px;
-      border-radius:20px;
-      box-shadow:0 8px 20px rgba(0,0,0,.08);
-    ">
-      Termo de ciência do uso de dados
-    </h1>
-
-<div style="
-max-width:900px;
-margin:30px auto;
-background:white;
-padding:30px;
-border-radius:20px;
-box-shadow:0 8px 20px rgba(0,0,0,.08);
-">
-
-<h3 style="
-margin:0 0 15px;
-background:none;
-border:none;
-padding:0;
-font-size:24px;
-color:#1f3c5c;
-">
-ℹ️ Finalidade do formulário
-</h3>
-
-<p style="
-margin:0;
-font-size:20px;
-line-height:1.8;
-color:#555;
-">
-Esse formulário confirma sua inscrição para o evento.
-As informações coletadas serão utilizadas para cadastro,
-gestão e organização do evento.
-</p>
-
-</div>
-
-      <div class="termo-buttons">
-
-        <button class="btn btn-aceito" onclick="abrirTermo2()">
-          Aceito
-        </button>
-
-        <button class="btn btn-nao" onclick="alert('É necessário aceitar o termo.')">
-          Não aceito
-        </button>
-
+    <div class="resultado">
+      <div>
+        <p class="quem" id="contexto"></p>
+        <p class="veredito" id="veredito"></p>
+        <p class="vpct" id="vpct" hidden></p>
+        <dl class="trio">
+          <div><dt>Orçado (R$)</dt><dd id="k-orc"></dd></div>
+          <div><dt>Realizado (R$)</dt><dd id="k-real"></dd></div>
+          <div><dt>Variação (R$)</dt><dd id="k-var"></dd></div>
+        </dl>
+        <p class="base-nota">Valores pelo Total OBZ.</p>
       </div>
-
+      <ul class="destaques" id="destaques"></ul>
     </div>
 
-  </div>
-
-  <div id="termo2" style="display:none; background:#EAF5EC; min-height:100vh; padding-top:30px;">
-
-<h1 style="
-  text-align:center;
-  color:#1f3c5c;
-  font-size:38px;
-  margin:0 0 10px;
-  font-family:'Noto Serif JP', serif;
-">
-</h1>
-
-<p style="
-  font-size:18px;
-  color:#666;
-  text-align:center;
-  margin:0 auto 30px;
-  line-height:1.6;
-">
-     <div class="termo-box">
-
-<h3 style="
-margin-top:0;
-margin-bottom:20px;
-font-size:24px;
-color:#1f3c5c;
-">
-📋 Condições de participação
-</h3>
-
-<p style="
-font-size:20px;
-line-height:1.8;
-color:#555;
-margin:0;
-">
-A participação no evento implica concordância com as regras de hospedagem, alimentação e deslocamento.
-</p>
-      <div class="termo-buttons">
-
-        <button class="btn btn-aceito" onclick="abrirFormulario()">
-          Aceito
-        </button>
-
-        <button class="btn btn-nao" onclick="alert('É necessário aceitar as regras.')">
-          Não aceito
-        </button>
-
+    <section aria-labelledby="h-graf">
+      <h2 id="h-graf">Mês a mês</h2>
+      <p class="sub" id="graf-sub"></p>
+      <div class="painel">
+        <div class="grafico" id="grafico"></div>
+        <div class="legenda"><span><i style="background:var(--semola)"></i>Orçado</span><span><i style="background:var(--basil)"></i>Realizado dentro do orçado</span><span><i style="background:var(--tomato)"></i>Realizado acima do orçado</span></div>
       </div>
+    </section>
 
-    </div>
+    <section aria-labelledby="h-cc">
+      <h2 id="h-cc">Centros de custo</h2>
+      <p class="sub" id="cc-sub"></p>
+      <div class="painel rolagem">
+        <table>
+          <thead><tr><th>Centro de custo</th><th class="num">Orçado</th><th class="num">Realizado</th><th class="num">Variação</th><th class="num">%</th><th style="text-align:left">Realizado contra o orçado</th></tr></thead>
+          <tbody id="tb-cc"></tbody>
+        </table>
+        <div class="legenda"><span><i style="background:var(--basil)"></i>Gasto realizado</span><span><i style="background:var(--semola);width:3px;height:14px"></i>Limite orçado</span><span>Valores como na planilha: despesa é negativa; variação positiva é saving.</span></div>
+      </div>
+    </section>
 
-  </div>
+    <section aria-labelledby="h-pac">
+      <h2 id="h-pac">Pacotes e contas</h2>
+      <p class="sub" id="pac-sub"></p>
+      <div class="painel rolagem">
+        <table>
+          <thead><tr><th>Pacote</th><th class="num">Orçado</th><th class="num">Realizado</th><th class="num">Variação</th><th class="num">%</th></tr></thead>
+          <tbody id="tb-pac"></tbody>
+        </table>
+      </div>
+      <p class="nota" id="pac-nota"></p>
+    </section>
 
-  <div class="formulario" id="formulario" style="background:#EAF5EC; min-height:100vh;">
+    <section aria-labelledby="h-just">
+      <h2 id="h-just">Justificativas de estouro e saving</h2>
+      <p class="sub" id="just-sub"></p>
+      <div class="jfiltros">
+        <label class="campo"><span>Pacote</span><select id="just-pac"></select></label>
+        <label class="campo"><span>Buscar no texto</span><input type="search" id="just-busca" placeholder="Ex.: Enabley, viagem, multa"></label>
+      </div>
+      <div class="just-grid" id="just"></div>
+    </section>
 
-<!-- =========================
-     INFORMAÇÕES DO EVENTO
-     ========================= -->
-
-<div class="evento-topo">
-
-  <!-- TÍTULO -->
-  <div class="evento-titulo">
-
-    <h2>
-      ☕ Escola Operacional
-    </h2>
-
-    <div class="marca-evento">
-      Casa do Pão de Queijo
-      <span class="ano-evento">| 2026</span>
-    </div>
-
-  </div>
-
-
-  <!-- OBJETIVO -->
-  <div class="objetivo-evento">
-
-    <strong>
-      Objetivo do Escola Operacional.
-    </strong>
-
-    <p>
-      Fortalecer o conhecimento dos operadores sobre a cultura do Grupo Trigo,
-      os aspectos estratégicos que orientam a evolução dos produtos do cardápio
-      e as técnicas de preparo de café, vendas e atendimento ao cliente,
-      promovendo maior engajamento, excelência operacional e melhores
-      experiências para os clientes.
-    </p>
-
-  </div>
-
-
-  <!-- TRÊS INFORMAÇÕES -->
-  <div class="info-evento">
-
-
-    <!-- LOCAL -->
-    <div class="info-card">
-
-      <strong>
-        📍 Local
-      </strong>
-
-      <p>
-        Cozinha Escola SP<br>
-        Rua Fernandes Moreira, 1472<br>
-        Chácara Santo Antônio
-      </p>
-
-    </div>
-
-
-    <!-- CUSTOS DO RESTAURANTE -->
-    <div class="info-card">
-
-      <strong>
-
-• Despesas do Restaurante
-      </strong>
-
-      <p>
-        Deslocamento (aéreo, rodoviário, Uber e afins), hospedagem e
-        jantar.
-      </p>
-
-    </div>
-
-
-    <!-- CUSTOS COBERTOS -->
-    <div class="info-card">
-
-      <strong>
-        ✓ Despesas do Grupo Trigo
-      </strong>
-
-      <p>
-         Almoço e coffee break.
-        
-      </p>
-
-    </div>
-
-  </div>
-
+    <details class="confere" id="confere" hidden>
+      <summary id="confere-n"></summary>
+      <ul id="confere-lista"></ul>
+    </details>
+  </main>
 </div>
 
-
-<!-- =========================
-     ÁREA DE INSCRIÇÃO
-     ========================= -->
-
-<div class="inscricao-area">
-
-
-  <!-- PRAZO -->
-  <div class="prazo-inscricao">
-
-    <p>
-      📅 Inscrições abertas até 17 de setembro
-      <br>
-      👥 Vagas limitadas: 30 participantes
-       <br>
-          • Uma vaga por restaurante.
-    </p>
-
+<input type="file" id="arquivo" accept=".xlsx,.xlsm,.xls" class="sr" tabindex="-1" aria-hidden="true">
+<dialog id="dlg" aria-labelledby="dlg-titulo">
+  <h2 id="dlg-titulo"></h2>
+  <div id="dlg-corpo"></div>
+  <div class="acoes">
+    <button class="btn sec" id="dlg-cancelar" type="button">Cancelar</button>
+    <button class="btn" id="dlg-ok" type="button">Publicar esta base</button>
   </div>
+</dialog>
+<div class="toast" id="toast" role="status" hidden></div>
 
-<input type="text" id="nome" placeholder="Nome completo">
-
-
-<input 
-type="text"
-id="cpf"
-placeholder="CPF (somente números)"
-maxlength="11"
-inputmode="numeric"
-oninput="this.value=this.value.replace(/\D/g,'')"
->
-
-<input 
-  type="text" 
-  id="nascimento" 
-  placeholder="Data de nascimento (somente números)"
-  maxlength="8"
-  inputmode="numeric"
-  oninput="this.value=this.value.replace(/\D/g,'')"
->
-
-<input 
-  type="text" 
-  id="celular" 
-  placeholder="Celular com DDD"
-  maxlength="11"
-  inputmode="numeric"
-  oninput="this.value=this.value.replace(/\D/g,'')"
->
-
-<input type="text" id="marca" value="CASA DO PÃO DE QUEIJO" readonly>
-
-        <input
-  list="listaRestaurantes"
-  id="restaurante"
-  placeholder="Digite o nome do restaurante"
->
-
-<datalist id="listaRestaurantes">
-
-<!-- T1 - 13/10 e 14/10 -->
-
-<!-- T1 - 13/10 e 14/10 -->
-<option 
-  value="CPQ BOAVISTA SHOPPING" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - AER CONGONHAS DESEMB" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - ARMARINHO FERNANDO II MOOCA" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - ARMARINHOS FERNANDO TATUAPE" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - CAFETERIA VILLAGIO PANAMBY" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - CASA DI ROMA" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - CCS VERBO DIVINO" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - CLUBE SAO PAULO" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="COLÉGIO PIO XII" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - FACULDADE SENAC" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - GALERIA GEMINI" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - GALERIA METROPOLE" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - HIPER ANDORINHA" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - HOSPITAL ALBERT SABIN" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ HOSPITAL NOVE DE JULHO" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - HOSP. OSWALDO CRUZ 13 DE MAIO" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - HOSPITAL PAULISTANO" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - HOSP PEROLA BYINGTON" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ HOSPITAL SEPACO" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - HOSPITAL TORRE ITAICI" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ HOSPITAL VILLA LOBOS" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - HSANP" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - LAPA 01" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - MACKENZIE" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - MED CENTER ITACOLOMI" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - METRO STA.CRUZ" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - POSTO SHELL SAUDE" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - RUA DA MOOCA" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - RUA TUIM" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SALOMAO ZOPPI PARAISO" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING AN FRANCO UCI" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING BOURBOM POMPEIA" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING CIDADE JARDIM" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING LESTE ARICANDUVA" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING METRO TATUAPE" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING MOOCA" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING MORUMBI" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING TIETE PLAZA" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING WEST PLAZA" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPINGPING BOA VISTA SP" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - TERMINAL BARRA FUNDA" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - TERMINAL BARRA FUNDA  LJ2 GR" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - TERMINAL JABAQUARA" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ TERMINAL RODOVIARIO TIETE  DESEMBARQUE" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ TERMINAL RODOVIARIO TIETE  MEZANINO" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ TERMINAL RODOVIARIO TIETE AQUARIO" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - TORRE GRSA DROGASIL" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO GUARULHOS DESEMBARQUE INTERNACIONAL" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO GUARULHOS EMBARQUE INTERNACIONAL" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO GUARULHOS EMBARQUE INTERNACIONAL CENTRAL" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO GUARULHOS EMBARQUE INTERNACIONAL CHECKIN" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO GUARULHOS EMBARQUE TERMINAL 1" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO GUARULHOS EMBARQUE TERMINAL 2" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - OUTLET S MARCAS GUAR" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - POSTO IPIRANGA ITAQUA I" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - CARREF. JUNDIAI" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - HOSP SINO BRASILEIRO" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SBT" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING UNIAO OSASCO" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - ARMARINHO FERNANDO SANTO ANDRÉ" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - CENTRO MED CATEQUESE" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - GRAN PLAZA SHOPPING ABC" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ HOSPITAL CHRISTOVAO DA GAMA" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - MEMORIAL DO CEMITÉRIO" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPINGPING GOLDEN SQUARE" 
-  data-turma="T1" 
-  data-data="13/10 e 14/10"> 
-</option>
-
-<!-- T2 - 15/10 e 16/10 -->
-<option 
-  value="CPQ - POSTO IPIRANGA ITAQUA II" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPINGPING RIO PRETO" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPINGPING CENTER VALLE" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING CATARINA FASH LOJA 1" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING CATARINA FASH LOJA 2" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - CNA ITAPETININGA" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPINGPING TAUBATE" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING IGU ESPLAN SORO" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING PRAIA COSTA 2" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING VITORIA" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ HOSPITAL MATER DEI CONTORNO" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ HOSPITAL MATER DEI SANTO AGOSTINHO" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ HOSPITAL MATER DEI BETIM" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AER CONFINS EMBARQUE" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - C MEDICO MONTE SINAI" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AER UBERLANDIA EMB" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - POSTO OLA RESENDE" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AER GALEAO EMB TPS1" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROP GALEAO TPS2 DE" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROP GALEAO TPS2 EM" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - CARREF. BARRA LOJA" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - CARREF. BARRA QUIOSQUE" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - GALEAO SAZONAL" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="Loja de Treinamento CPQ" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - POSTO SHELL RECREIO" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - PROJAC" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING CITTA AMER.BARR" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING GAVEA" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING TIJUCA 1" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - TERMINAL RODOVIÁRIO VIA RIO" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ TERM ROD NOVO RIO" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AER VIRACOPOS PIER C" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - CAMPINAS 8" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ CDS HOSP VERA CRUZ" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - HOSP. SANTA TEREZA" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - HOSPITAL VERA CRUZ" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ TERMINAL RODOVIARIO CAMPINAS EMBARQUE" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ TERMINAL RODOVIARIO CAMPINAS MEZANINO" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ OFALTMO CARE" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROP RIBEIRAO PRETO" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - HOSP S. LUCAS RIBEIR" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - HOSP SAO LUCAS CENTR" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AER FOZ DO IGUACU EM" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AER FOZ IGUACU PRACA" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROP LONDRINA EMB" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - POSTO SHELL MARINGA" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROPORTO CURITIBA" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROP CURITIBA EMB 1" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROP CURITIBA EMB 2" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROPORTO PELOTAS" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO PORTO ALEGRE EMBARQUE DOMESTICO" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO PORTO ALEGRE EMBARQUE PIER" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO PORTO ALEGRE INTERNACIONAL CHECKIN" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO PORTO ALEGRE MARKET PLACE" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING IGUATEMI PORTO ALEGRE" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROPORTO URUGUAIANA" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROP FLORI EMB DOM" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AER FLORIAN EMB INTE" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPINGPING ITAJAI" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROP NAVEGANTES EMB" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<option 
-  value="CPQ - AER NAVEGANTES PRACA" 
-  data-turma="T2" 
-  data-data="15/10 e 16/10"> 
-</option>
-
-<!-- T3 - 21/10 e 22/10 -->
-<option 
-  value="CPQ - TORRE CEMITÉRIO FLORES DO PARQUE" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - HOME CENTER CARAJAS" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - POSTO ESQUINA BR PIRÂMIDE" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING PQ MACEIO" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPINGPING MACEIO" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - POSTO CANTINHO IPIRANGA MARAGOGI" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO MANAUS DESEMBARQUE" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO MANAUS EMBARQUE" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO MANAUS INTERNACIONAL" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - HIPER DB PONTA NEGRA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - CPQ POSTO BR MANAUS" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING CENTER AMAZONAS" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - BOUL. FEIRA SANTANA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPINGPING ITABUNA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - AER SALVADOR DESEMB" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - GRAN HOTEL STELLA MARIS" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING BARRA SALVADOR" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING DA BAHIA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING SALVADOR NORTE" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING CONQUISTA SUL" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - AER FOR EMB DOM SAGU" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO FORTALEZA EMBARQUE INTERNACIONAL" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO FORTALEZA EMBARQUE LESTE" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO FORTALEZA PRAÇA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - UNIVER. DE FORTALEZA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO BRASILIA PIER CENTRAL" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO BRASILIA PIER NORTE" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO BRASILIA PIER SUL" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - CENTRO EMPRES CNC DF" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - GREEN TOWERS BRAS" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - HOSP. ALVORADA BSB" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPINGPING TAGUATINGA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - TERMINAL BRASILIA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROP GOIANIA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO IMPERATRIZ" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - AER SAO LUIS DESEMBA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO SAO LUIS EMB" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - POSTO SHELL SIDROLANDIA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - HOSPITAL TORRE DOS OLHOS TRES LAGOAS" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - AER CUIABA EMBARQUE" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - AER CUIABA PRACA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING METROP ANANINDEUA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROPORTO BELEM" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING PARQUE BELEM" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO MARABA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROPORTO CARAJAS" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - PARAUAPEBAS CENTRO" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO RECIFE CHECKIN" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO RECIFE DESEMBARQUE NORTE" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO RECIFE DESEMBARQUE SUL" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO RECIFE EMBARQUE INTERNACIONAL" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ AEROPORTO RECIFE EMBARQUE REMOTO" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - AEROPORTO DE TERESINA EMBARQUE" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPINGPING RIO POTY" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - SHOPPING PORTO VELHO" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - GALERIA MEGAFARMA RR" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="POSTO CORNER SHELL SELECT CAFÉ PLUS PREMIUM" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ POSTO SHELL ARAGUAINA" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-<option 
-  value="CPQ - AER DE PALMAS LJ2 PR" 
-  data-turma="T3" 
-  data-data="21/10 e 22/10"> 
-</option>
-
-</datalist>
-
-        <input type="email" id="email" placeholder="E-mail do restaurante">
-
-
-        <h3>Turma - São Paulo</h3>
-
-        <input type="text" id="turma" readonly>
-
-        <h3>Data da participação</h3>
-
-        <input type="text" id="datas" readonly>
-
-        <button class="enviar" onclick="enviar()">
-  Enviar inscrição
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-  </div>
-
-</div>
-
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+/* ===== Leitura da aba BASE (DRE) ===== */
+var MESES_K = ['JANEIRO','FEVEREIRO','MARCO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+var MESES_NOME = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+var PKG = new Set(['PESSOAL','OCUPACAO E GASTOS ESTRUTURAIS','MANUTENCAO E ALUGUEL DE MAQUINAS E EQUIPAMENTOS','INFORMATICA E TELECOM','TERCEIROS','UTILIDADES','CONSUMO E LIMPEZA','LOCOMOCAO E ALIMENTACAO','MARKETING','JURIDICAS','DESPESAS TRIBUTARIAS','DESPESAS GERAIS']);
+var SELF = new Set(['FRETES E CARRETOS','DEPRECIACAO E AMORTIZACAO','RESULTADO DE EQUIVALENCIA PATRIMONIAL','RATEIO']);
+var FORA = new Set(['DEPRECIACAO E AMORTIZACAO','RESULTADO DE EQUIVALENCIA PATRIMONIAL','RATEIO']); // pacotes que não entram no Total OBZ
+var IGNORAR = new Set(['LUCRO BRUTO','DESEMPENHO OPERACIONAL','IMPOSTOS SOBRE VENDAS']);
 
-function iniciarFormulario() {
-
-  document
-    .getElementById("capaInicial")
-    .style.display = "none";
-
-  document
-    .getElementById("termo1")
-    .style.display = "block";
-
+function norm(s) {
+  return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase();
 }
-
-
-function abrirTermo2() {
-
-  document
-    .getElementById("termo1")
-    .style.display = "none";
-
-  document
-    .getElementById("termo2")
-    .style.display = "block";
-
+function limpo(s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); }
+function num(v) {
+  if (typeof v === 'number') return isFinite(v) ? v : null;
+  if (v == null) return null;
+  var s = String(v).trim();
+  if (!s) return null;
+  if (/,\d{1,2}$/.test(s)) s = s.replace(/\./g, '').replace(',', '.');
+  var n = Number(s.replace(/[^\d.\-eE]/g, ''));
+  return isFinite(n) ? n : null;
 }
+var MINUSC = new Set(['DE','DA','DO','DOS','DAS','E']);
+function bonito(s) {
+  return limpo(s).split(' ').map(function (w, i) {
+    var u = w.toUpperCase();
+    if (i > 0 && MINUSC.has(u)) return u.toLowerCase();
+    if (/[&\d]/.test(u) || u.length <= 2 || u === '-') return u;
+    return u.charAt(0) + u.slice(1).toLowerCase();
+  }).join(' ');
+}
+function acharCabecalho(rows) {
+  var alvo = { cc: 'CENTRO DE CUSTO', pac: 'PACOTE', real: 'REALIZADO', orc: 'ORCADO', mes: 'MES' };
+  for (var r = 0; r < Math.min(rows.length, 40); r++) {
+    var row = rows[r] || [], cols = {}, achou = 0;
+    for (var c = 0; c < row.length; c++) {
+      var k = norm(row[c]);
+      for (var nome in alvo) if (cols[nome] === undefined && k === alvo[nome]) { cols[nome] = c; achou++; }
+    }
+    if (achou === 5) return { linha: r, cols: cols };
+  }
+  return null;
+}
+function brl0(n) { return Math.round(n).toLocaleString('pt-BR'); }
 
+function lerBase(rows, arquivo) {
+  var cab = acharCabecalho(rows);
+  if (!cab) throw new Error('Não encontrei as colunas CENTRO DE CUSTO, PACOTE, REALIZADO, ORÇADO e MÊS nessa aba.');
+  var C = cab.cols;
+  var ccIdx = new Map(), ccNomes = [], nomeIdx = new Map(), nomes = [];
+  var variantes = new Map(), acum = {}, agg = new Map(), mesesSet = new Set();
+  function idCC(k, raw) { if (!ccIdx.has(k)) { ccIdx.set(k, ccNomes.length); ccNomes.push(bonito(raw)); } return ccIdx.get(k); }
+  function idNome(k, raw) { if (!nomeIdx.has(k)) { nomeIdx.set(k, nomes.length); nomes.push(limpo(raw)); } return nomeIdx.get(k); }
+  function add(cc, mi, tipo, n, p, real, orc) {
+    var key = cc + '|' + mi + '|' + tipo + '|' + n + '|' + p, a = agg.get(key);
+    if (!a) { a = [cc, mi, tipo, n, p, 0, 0]; agg.set(key, a); }
+    a[5] += real; a[6] += orc;
+  }
+  var bloco = null, cc = -1, mi = -1, pend = [];
+  function emitP(row, contas) {
+    var p = idNome(row.k, row.raw);
+    add(cc, mi, FORA.has(row.k) ? 'N' : 'P', p, -1, row.real, row.orc);
+    contas.forEach(function (a) { add(cc, mi, 'C', idNome(a.k, a.raw), p, a.real, a.orc); });
+  }
+  function flushSelf() {
+    if (pend.length && SELF.has(pend[pend.length - 1].k)) { var l = pend.pop(); emitP(l, [l]); }
+  }
+  for (var r = cab.linha + 1; r < rows.length; r++) {
+    var row = rows[r]; if (!row) continue;
+    var rawCC = row[C.cc], rawP = row[C.pac], rawM = row[C.mes];
+    if (rawCC == null || rawP == null || rawM == null) continue;
+    var kcc = norm(rawCC), k = norm(rawP), m = MESES_K.indexOf(norm(rawM));
+    if (!kcc || !k) continue;
+    var sRaw = String(rawCC);
+    if (!variantes.has(kcc)) variantes.set(kcc, new Set());
+    variantes.get(kcc).add(sRaw);
+    var real = num(row[C.real]), orcRaw = num(row[C.orc]);
+    if (kcc === 'ACUMULADO') { if (m >= 0 && k === 'TOTAL OBZ') acum[m] = (acum[m] || 0) + (real || 0); continue; }
+    if (m < 0) continue;
+    if (orcRaw === null && (/^(DESP|PROV)/.test(k) || !real)) continue; // detalhamento contábil sem orçamento
+    real = real || 0; var orc = orcRaw || 0;
+    var b = kcc + '|' + m;
+    if (b !== bloco) { flushSelf(); pend = []; bloco = b; cc = idCC(kcc, rawCC); mi = m; mesesSet.add(m); }
+    if (k === 'TOTAL CBZ') { add(cc, mi, 'B', -1, -1, real, orc); continue; }
+    if (/^(CUSTO|RECEITA)/.test(k) || IGNORAR.has(k)) continue;
+    var item = { k: k, raw: rawP, real: real, orc: orc };
+    if (k === 'TOTAL OBZ') { flushSelf(); pend = []; add(cc, mi, 'T', -1, -1, real, orc); continue; }
+    if (SELF.has(k)) {
+      if (pend.length && pend[pend.length - 1].k === k) emitP(item, [pend.pop()]);
+      else { flushSelf(); pend.push(item); }
+      continue;
+    }
+    flushSelf();
+    if (PKG.has(k)) { emitP(item, pend); pend = []; continue; }
+    if (pend.length >= 2) {
+      var sr = 0, so = 0; pend.forEach(function (a) { sr += a.real; so += a.orc; });
+      var tol = 0.51 * pend.length + 0.01;
+      if (Math.abs(sr - real) <= tol && Math.abs(so - orc) <= tol && Math.abs(sr) + Math.abs(so) > 0) { emitP(item, pend); pend = []; continue; }
+    }
+    pend.push(item);
+  }
+  flushSelf();
+  if (!mesesSet.size) throw new Error('A aba foi encontrada, mas não há linhas com meses (JANEIRO, FEVEREIRO…) na coluna MÊS.');
 
-function abrirFormulario() {
-
-  document
-    .getElementById("termo2")
-    .style.display = "none";
-
-  const formulario =
-    document.getElementById("formulario");
-
-  formulario.style.display = "block";
-
-  formulario.scrollIntoView({
-    behavior: "smooth"
+  var linhas = [], totT = {}, totP = {};
+  agg.forEach(function (a) {
+    a[5] = Math.round(a[5] * 100) / 100; a[6] = Math.round(a[6] * 100) / 100;
+    if (!a[5] && !a[6]) return;
+    linhas.push(a);
+    var key = a[0] + '|' + a[1];
+    if (a[2] === 'T') totT[key] = (totT[key] || 0) + a[5];
+    if (a[2] === 'P') totP[key] = (totP[key] || 0) + a[5];
   });
+  var meses = Array.from(mesesSet).sort(function (a, b) { return a - b; });
 
+  var avisos = [];
+  variantes.forEach(function (set, kcc) {
+    if (set.size > 1) avisos.push('“' + kcc + '” aparece escrito de ' + set.size + ' formas na base (há espaços sobrando em algumas linhas). Aqui tudo foi somado junto; no Excel, as fórmulas SOMASES deixam essas linhas de fora.');
+  });
+  var somaMes = {};
+  Object.keys(totT).forEach(function (key) { var mm = +key.split('|')[1]; somaMes[mm] = (somaMes[mm] || 0) + totT[key]; });
+  meses.forEach(function (mm) {
+    if (acum[mm] !== undefined && Math.abs(acum[mm] - (somaMes[mm] || 0)) > 2)
+      avisos.push(MESES_NOME[mm] + ': as linhas ACUMULADO da base somam ' + brl0(acum[mm]) + ', mas os centros de custo somam ' + brl0(somaMes[mm] || 0) + '.');
+  });
+  var nFecha = 0;
+  Object.keys(totT).forEach(function (key) {
+    if (Math.abs((totP[key] || 0) - totT[key]) > 2) {
+      nFecha++;
+      if (nFecha <= 6) { var p = key.split('|'); avisos.push(ccNomes[+p[0]] + ', ' + MESES_NOME[+p[1]] + ': os pacotes somam ' + brl0(totP[key] || 0) + ' e o Total OBZ é ' + brl0(totT[key]) + '.'); }
+    }
+  });
+  if (nFecha > 6) avisos.push('Outros ' + (nFecha - 6) + ' blocos em que os pacotes não fecham com o Total OBZ.');
+  for (var i = 1; i < meses.length; i++) if (meses[i] !== meses[i - 1] + 1) avisos.push('Não há dados de ' + MESES_NOME[meses[i - 1] + 1] + ' na base.');
+
+  var ano = (String(arquivo || '').match(/20\d{2}/) || [new Date().getFullYear()])[0];
+  return { v: 1, ano: +ano, arquivo: String(arquivo || ''), em: new Date().toISOString(), meses: meses, ccs: ccNomes, nomes: nomes, avisos: avisos.slice(0, 14), linhas: JSON.stringify(linhas) };
 }
 
+/* ===== Justificativas: textos abaixo das tabelas (abas de centro de custo e abas "Acumulado") =====
+   Cada justificativa vira [periodo, centroDeCusto, pacote, valor, linhas]
+   periodo: 0-11 = mês, 12 = 1º semestre, 13 = 2º semestre; centroDeCusto: índice em ccs ou -1 (geral) */
+var PAC_NOTA = {
+  PESSOAL: 'Pessoal', OCUPACAO: 'Ocupação e Gastos Estruturais', OCUPACAOEGASTOSESTRUTURAIS: 'Ocupação e Gastos Estruturais',
+  MANUTENCAO: 'Manutenção e Aluguel de Máquinas e Equipamentos', MANUTENCAOEALUGUELDEMAQUINASEEQUIPAMENTOS: 'Manutenção e Aluguel de Máquinas e Equipamentos',
+  INFORMATICAETELECOM: 'Informática e Telecom', TERCEIROS: 'Terceiros', FRETESECARRETOS: 'Fretes e Carretos', UTILIDADES: 'Utilidades',
+  CONSUMOELIMPEZA: 'Consumo e Limpeza', COSUMOELIMPEZA: 'Consumo e Limpeza', LOCOMOCAOEALIMENTACAO: 'Locomoção e Alimentação',
+  MARKETING: 'Marketing', JURIDICAS: 'Jurídicas', DESPESASTRIBUTARIAS: 'Despesas Tributárias', DESPESASGERAIS: 'Despesas Gerais',
+  DEPESASGERAIS: 'Despesas Gerais', DEPRECIACAOEAMORTIZACAO: 'Depreciação e Amortização'
+};
+function compacto(s) { return norm(s).replace(/[^A-Z0-9&]/g, ''); }
+function lerJustificativas(planilhas, ccs, mesPadrao) {
+  var ccMap = {};
+  ccs.forEach(function (n, i) { ccMap[compacto(n)] = i; });
+  function apelido(de, para) { if (ccMap[para] !== undefined && ccMap[de] === undefined) ccMap[de] = ccMap[para]; }
+  apelido('P&DVR', 'PESQUISAEDESENVOLVIMENTO'); apelido('PESQUISAEDESENVOLVIMENTOVR', 'PESQUISAEDESENVOLVIMENTO');
+  apelido('LEBONTONFRAQUIAS', 'LEBONTONFRANQUIAS'); apelido('P&DRJ', 'P&D-RJ'); apelido('P&DSP', 'P&D-SP');
+  apelido('LOJATREINAMENTOS', 'LOJASTREINAMENTO'); apelido('LOJASTREINAMENTOS', 'LOJASTREINAMENTO');
+  var SUB = new Set(['ORCADO', 'REALIZADO', 'SAVING', 'ESTOURO', 'RESUMO']);
+  var doCC = [], gerais = [];
 
-/* =========================
-   RESTAURANTES
-   ========================= */
-
-const restaurantes = {};
-
-const opcoes =
-  document.querySelectorAll("#listaRestaurantes option");
-
-
-opcoes.forEach(opcao => {
-
-  const nome = opcao.value;
-
-  restaurantes[nome] = {
-
-    turma:
-      opcao.dataset.turma || "",
-
-    data:
-      opcao.dataset.data || ""
-
-  };
-
-});
-
-
-const restauranteInput =
-  document.getElementById("restaurante");
-
-
-restauranteInput.addEventListener(
-  "change",
-  preencherDados
-);
-
-
-restauranteInput.addEventListener(
-  "input",
-  preencherDados
-);
-
-
-function preencherDados() {
-
-  const restaurante =
-    restauranteInput.value.trim();
-
-  const info =
-    restaurantes[restaurante];
-
-
-  if (info) {
-
-    document.getElementById("turma").value =
-      info.turma;
-
-    document.getElementById("datas").value =
-      info.data;
-
+  // Se existir uma aba "Justificativas" em formato de tabela, ela é a fonte única
+  var tabela = null;
+  planilhas.forEach(function (pl) {
+    if (tabela || norm(pl.nome).indexOf('JUSTIFICATIVA') !== 0) return;
+    var rows = pl.rows || [];
+    for (var r = 0; r < Math.min(rows.length, 30) && !tabela; r++) {
+      var col = {}, row = rows[r] || [];
+      for (var c = 0; c < row.length; c++) {
+        var k = norm(row[c]);
+        if (k === 'MES' || k === 'PERIODO') col.mes = c; else if (k === 'CENTRO DE CUSTO') col.cc = c; else if (k === 'PACOTE') col.pac = c;
+        else if (k === 'VALOR') col.val = c; else if (k.indexOf('JUSTIFICATIVA') === 0) col.txt = c;
+      }
+      if (col.mes !== undefined && col.cc !== undefined && col.txt !== undefined) tabela = { rows: rows, ini: r + 1, col: col };
+    }
+  });
+  if (tabela) {
+    var saida = [], C = tabela.col;
+    for (var r2 = tabela.ini; r2 < tabela.rows.length && saida.length < 3000; r2++) {
+      var rw2 = tabela.rows[r2]; if (!rw2) continue;
+      var texto = rw2[C.txt] == null ? '' : String(rw2[C.txt]).replace(/[\u2060\u200b\ufeff]/g, '').trim();
+      var km = compacto(rw2[C.mes]), per2 = MESES_K.indexOf(km);
+      if (per2 < 0 && /^[12]O?SEMESTRE$/.test(km)) per2 = km.charAt(0) === '1' ? 12 : 13;
+      if (!texto || per2 < 0) continue;
+      var kcc2 = compacto(rw2[C.cc]), cc2 = ccMap[kcc2] !== undefined ? ccMap[kcc2] : -1;
+      var pacRaw = C.pac !== undefined && rw2[C.pac] != null ? limpo(rw2[C.pac]) : '', pac2 = PAC_NOTA[compacto(pacRaw)] || pacRaw || 'Geral';
+      var v2 = C.val !== undefined ? rw2[C.val] : null;
+      var val2 = typeof v2 === 'number' ? 'R$ ' + v2.toLocaleString('pt-BR', { maximumFractionDigits: 2 }) : (v2 == null ? '' : limpo(v2));
+      var ls = texto.split(/\r?\n/).map(function (s) { return s.replace(/\s+/g, ' ').trim(); }).filter(Boolean).map(function (s) { return ['p', s.slice(0, 700)]; });
+      if (ls.length) saida.push([per2, cc2, pac2, val2, ls.slice(0, 60)]);
+    }
+    if (saida.length) return saida;
   }
 
-  else {
+  planilhas.forEach(function (pl) {
+    var rows = pl.rows || [], nomeK = norm(pl.nome);
+    if (rows.length > 1500 || /BASE/.test(nomeK)) return;
+    var kcc = null, marc = -1, r, c;
+    for (r = 0; r < rows.length; r++) {
+      var row = rows[r]; if (!row) continue;
+      for (c = 0; c < row.length; c++) {
+        if (typeof row[c] !== 'string') continue;
+        var k = norm(row[c]);
+        if (r < 12 && kcc === null && k === 'CENTRO DE CUSTO') {
+          for (var d = c + 1; d < row.length; d++) if (row[d] != null && String(row[d]).trim()) { kcc = compacto(row[d]); break; }
+        }
+        if (k === 'DESEMPENHO OPERACIONAL') marc = r;
+      }
+    }
+    if (marc < 0) return;
+    var acumulado = /ACUMULADO/.test(nomeK), semestral = acumulado && /SEMESTRE/.test(nomeK);
+    var ccFixo = !acumulado && kcc !== null && ccMap[kcc] !== undefined ? ccMap[kcc] : -1;
+    if (!acumulado && ccFixo < 0) return;
 
-    document.getElementById("turma").value = "";
-
-    document.getElementById("datas").value = "";
-
-  }
-
+    var per = acumulado ? (semestral ? 12 : -1) : mesPadrao, pac = 'Geral', cc = ccFixo, ent = null, ultR = -9, dest = acumulado ? gerais : doCC, n = 0;
+    function nova(valor) { ent = [per, cc, pac, valor || '', []]; dest.push(ent); }
+    for (r = marc + 1; r < rows.length && n < 900; r++) {
+      var rw = rows[r]; if (!rw) continue;
+      var strs = [], nums = [];
+      for (c = 0; c < rw.length; c++) {
+        var v = rw[c];
+        if (typeof v === 'number' && isFinite(v)) nums.push(v);
+        else if (typeof v === 'string') { var s = v.replace(/[\u2060\u200b\ufeff]/g, '').replace(/\s+/g, ' ').trim(); if (s && s !== '-' && s !== '↓' && s !== '↕') strs.push(s); }
+      }
+      if ((!strs.length && !nums.length) || nums.length >= 3) continue;
+      var valores = nums.map(function (x) { return 'R$ ' + x.toLocaleString('pt-BR', { maximumFractionDigits: 2 }); }).join(' / ');
+      if (!strs.length) { if (per >= 0) { if (!ent) nova(); ent[4].push(['v', valores]); n++; } ultR = r; continue; }
+      var bruto = strs.join(' — '), kt = norm(bruto), curto = strs.length === 1 && bruto.length < 64;
+      // cabeçalhos
+      if (curto) {
+        var m = bruto.match(/^(.*?)\s*[:\-–]?\s*((?:R\$\s*)?\d[\d.,]*\s*(?:K|mil)?)?\s*\.?\s*$/i);
+        var nome = m ? m[1].replace(/[\s:\-–.]+$/, '') : bruto, valor = m && m[2] ? m[2].replace(/\s+/g, ' ').replace(/^R\$\s*/, 'R$ ') : '', kc = compacto(nome);
+        var iMes = MESES_K.indexOf(kc);
+        if (iMes >= 0 && !valor) { per = iMes; if (acumulado) { pac = 'Geral'; cc = -1; } ent = null; ultR = r; continue; }
+        if (!acumulado && !dest.some(function (e) { return e[1] === ccFixo && e[4].length; }) && !ent && MESES_K.some(function (mm, i2) { if (kt.indexOf(mm) >= 0) { iMes = i2; return true; } return false; })) { per = iMes; ultR = r; continue; }
+        if (/^[12]O?SEMESTRE$/.test(kc)) { per = kc.charAt(0) === '1' ? 12 : 13; pac = 'Geral'; ent = null; ultR = r; continue; }
+        if (per >= 0 && PAC_NOTA[kc]) { pac = PAC_NOTA[kc]; if (acumulado) cc = -1; nova(valor); ultR = r; continue; }
+        if (per >= 0 && acumulado && ccMap[kc] !== undefined) { cc = ccMap[kc]; nova(valor); ultR = r; continue; }
+      }
+      if (per < 0) continue;
+      if (!ent) nova();
+      var txt = (bruto + (valores ? ' — ' + valores : '')).slice(0, 700), tipo = 'p';
+      if (curto && SUB.has(kt.replace(/[.:]$/, ''))) tipo = 's';
+      else if (curto && (/:\s*$/.test(bruto) || /[:\-–]\s*R\$\s*[\d.,]+\s*(K|mil)?\s*\.?$/i.test(bruto))) tipo = 'b';
+      var ant = ent[4][ent[4].length - 1];
+      if (tipo === 'p' && ant && ant[0] === 'p' && r === ultR + 1 && /^[a-zà-ú]/.test(bruto)) ant[1] = (ant[1] + ' ' + txt).slice(0, 700);
+      else { ent[4].push([tipo, txt]); n++; }
+      ultR = r;
+    }
+  });
+  var tem = new Set();
+  doCC = doCC.filter(function (e) { return e[4].length; });
+  doCC.forEach(function (e) { tem.add(e[1] + '|' + e[0]); if (e[3]) tem.add('v|' + e[0] + '|' + e[2] + '|' + e[3].replace(/\s/g, '')); });
+  gerais = gerais.filter(function (e) { return e[4].length && !(e[1] >= 0 && tem.has(e[1] + '|' + e[0])) && !(e[1] < 0 && e[3] && tem.has('v|' + e[0] + '|' + e[2] + '|' + e[3].replace(/\s/g, ''))); });
+  return doCC.concat(gerais);
 }
 
+/* ===== Painel ===== */
+(function () {
+  var MES_ABR = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  var $ = function (id) { return document.getElementById(id); };
+  var MODO = 'site';
+  var S = { just: [], justAbertos: new Set(), jPac: '', jBusca: '', porCC: {}, base: null, linhas: [], periodo: 'ano', cc: -1, abertos: new Set(), db: null, podeEnviar: true, pendente: null, local: false };
 
-/* =========================
-   ENVIO DA INSCRIÇÃO
-   ========================= */
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function f0(n) { return Math.round(n).toLocaleString('pt-BR'); }
+  function rs(n) { return 'R$ ' + f0(Math.abs(n)); }
+  function sinal(n) { var r = Math.round(n); return (r > 0 ? '+' : r < 0 ? '−' : '') + Math.abs(r).toLocaleString('pt-BR'); }
+  function pct(v, orc) { if (!orc) return null; return v / Math.abs(orc); }
+  function fpct(p) { return p == null ? 'sem orçamento' : (p > 0 ? '+' : p < 0 ? '−' : '') + (Math.abs(p) * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + '%'; }
+  function cls(v) { return Math.round(v) > 0 ? 'pos' : Math.round(v) < 0 ? 'neg' : ''; }
+  function dataBR(iso) { try { return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
 
-async function enviar() {
-
-
-  const nome =
-    document.getElementById("nome").value.trim();
-
-
-  const cpf =
-    document.getElementById("cpf").value.trim();
-
-
-  const nascimento =
-    document.getElementById("nascimento").value.trim();
-
-
-  const celular =
-    document.getElementById("celular").value.trim();
-
-
-  const restaurante =
-    document.getElementById("restaurante").value.trim();
-
-
-  const email =
-    document.getElementById("email").value.trim();
-
-
-  const turma =
-    document.getElementById("turma").value.trim();
-
-
-  const datas =
-    document.getElementById("datas").value.trim();
-
-
-  /* =========================
-     VALIDAÇÃO
-     ========================= */
-
-  if (
-    !nome ||
-    !cpf ||
-    !nascimento ||
-    !celular ||
-    !restaurante ||
-    !email ||
-    !turma ||
-    !datas
-  ) {
-
-    alert(
-      "Por favor, preencha todos os campos antes de enviar."
-    );
-
-    return;
-
+  function mesesDoPeriodo() {
+    var m = S.base.meses;
+    if (S.periodo === 'ano') return m.slice();
+    if (S.periodo === 's1') return m.filter(function (x) { return x < 6; });
+    if (S.periodo === 's2') return m.filter(function (x) { return x >= 6; });
+    return [+S.periodo];
+  }
+  function nomePeriodo() {
+    var m = S.base.meses;
+    if (S.periodo === 'ano') return m.length > 1 ? 'acumulado de ' + MESES_NOME[m[0]].toLowerCase() + ' a ' + MESES_NOME[m[m.length - 1]].toLowerCase() : MESES_NOME[m[0]].toLowerCase();
+    if (S.periodo === 's1') return '1º semestre';
+    if (S.periodo === 's2') return '2º semestre';
+    return MESES_NOME[+S.periodo].toLowerCase();
   }
 
+  function emPeriodo() { return (/^\d+$/.test(S.periodo) ? 'em ' : 'no ') + nomePeriodo(); }
 
-  const dataParticipacao = datas;
+  function carregar(base, local) {
+    var linhas;
+    try { linhas = JSON.parse(base.linhas); } catch (e) { return; }
+    if (!Array.isArray(linhas) || !Array.isArray(base.meses) || !base.meses.length) return;
+    S.base = base; S.linhas = linhas; S.local = !!local;
+    S.just = entradas(base);
+    if (['ano', 's1', 's2'].indexOf(S.periodo) < 0 && base.meses.indexOf(+S.periodo) < 0) S.periodo = 'ano';
+    if (S.periodo === 's1' && !base.meses.some(function (x) { return x < 6; })) S.periodo = 'ano';
+    if (S.periodo === 's2' && !base.meses.some(function (x) { return x >= 6; })) S.periodo = 'ano';
+    if (S.cc >= base.ccs.length) S.cc = -1;
+    desenhar();
+  }
 
+  function desenhar() {
+    $('carregando').hidden = true;
+    var tem = !!S.base;
+    $('vazio').hidden = tem; $('painel').hidden = !tem;
+    $('btn-enviar').hidden = !S.podeEnviar; $('btn-enviar-vazio').hidden = !S.podeEnviar;
+    $('vazio-leitor').hidden = S.podeEnviar;
+    if (!tem) { $('base-info').textContent = ''; return; }
+    var b = S.base;
+    $('titulo').textContent = 'Controle orçamentário ' + b.ano;
+    $('base-info').innerHTML = 'Base em uso: <strong>' + esc(b.arquivo || 'arquivo sem nome') + '</strong><br>atualizada em ' + esc(dataBR(b.em)) + (S.local ? '<br><span class="erro">Visível só neste navegador</span>' : '');
 
-  /* =========================
-     DADOS ENVIADOS
-     ========================= */
+    // filtros
+    var h = '';
+    b.meses.forEach(function (m) { h += '<button class="chip" type="button" data-p="' + m + '" aria-pressed="' + (S.periodo === String(m)) + '">' + MES_ABR[m] + '</button>'; });
+    if (b.meses.some(function (x) { return x < 6; }) && b.meses.some(function (x) { return x >= 6; })) {
+      h += '<button class="chip grupo" type="button" data-p="s1" aria-pressed="' + (S.periodo === 's1') + '">1º semestre</button>';
+      h += '<button class="chip grupo" type="button" data-p="s2" aria-pressed="' + (S.periodo === 's2') + '">2º semestre</button>';
+    }
+    h += '<button class="chip grupo" type="button" data-p="ano" aria-pressed="' + (S.periodo === 'ano') + '">Acumulado do ano</button>';
+    $('chips').innerHTML = h;
+    var ordem = b.ccs.map(function (n, i) { return i; }).sort(function (a, c) { return b.ccs[a].localeCompare(b.ccs[c], 'pt-BR'); });
+    $('sel-cc').innerHTML = '<option value="-1">Todos os centros de custo</option>' + ordem.map(function (i) { return '<option value="' + i + '"' + (i === S.cc ? ' selected' : '') + '>' + esc(b.ccs[i]) + '</option>'; }).join('');
+    $('sel-cc').value = String(S.cc);
 
-  const dadosEnviar = {
-
-    nome: nome,
-
-    cpf:
-      cpf.replace(/\D/g, ''),
-
-    nascimento: nascimento,
-
-    celular: celular,
-
-    marca:
-      document.getElementById("marca").value,
-
-    restaurante: restaurante,
-
-    email: email,
-
-    turma: turma,
-
-    datas: datas
-
-  };
-
-
-  /* =========================
-     GOOGLE APPS SCRIPT
-     ========================= */
-
-  const url =
-    "https://script.google.com/macros/s/AKfycbwoi-JcHKq2-8yG1zgLjgxuzIYmR3FL3DtvUuTJIYDpqbnyl2Rf1z8SZ5tvAyNcK9Lx/exec";
-
-
-  try {
-
-
-    await fetch(url, {
-
-      method: "POST",
-
-      mode: "no-cors",
-
-      headers: {
-
-        "Content-Type":
-          "application/json"
-
-      },
-
-      body:
-        JSON.stringify(dadosEnviar)
-
+    var ms = new Set(mesesDoPeriodo());
+    var porCC = {}, porMes = {}, pac = {}, contas = {}, cbz = [0, 0], tot = [0, 0];
+    S.linhas.forEach(function (l) {
+      var cc = l[0], m = l[1], t = l[2], n = l[3], p = l[4], real = l[5], orc = l[6];
+      var doCC = S.cc < 0 || cc === S.cc, doMes = ms.has(m);
+      if (t === 'T') {
+        if (doMes) { var a = porCC[cc] || (porCC[cc] = [0, 0]); a[0] += real; a[1] += orc; }
+        if (doCC) { var g = porMes[m] || (porMes[m] = [0, 0]); g[0] += real; g[1] += orc; }
+        if (doCC && doMes) { tot[0] += real; tot[1] += orc; }
+      } else if (doCC && doMes) {
+        if (t === 'P' || t === 'N') { var q = pac[n] || (pac[n] = [0, 0, t]); q[0] += real; q[1] += orc; }
+        else if (t === 'C') { var cs = contas[p] || (contas[p] = {}); var c = cs[n] || (cs[n] = [0, 0]); c[0] += real; c[1] += orc; }
+        else if (t === 'B') { cbz[0] += real; cbz[1] += orc; }
+      }
     });
 
+    // veredito
+    var v = tot[0] - tot[1], p = pct(v, tot[1]);
+    var quem = S.cc < 0 ? 'A diretoria' : b.ccs[S.cc];
+    var ver = $('veredito');
+    var vp = $('vpct'), pt = p != null ? fpct(Math.abs(p)).replace('+', '') : '';
+    function bloco(tipo, cor, frase) {
+      ver.className = 'veredito ' + cor;
+      ver.innerHTML = '<span class="vtipo">' + tipo + '</span><span class="vvalor">' + esc(rs(v)) + '</span>';
+      vp.className = 'vpct ' + cor; vp.hidden = false; vp.innerHTML = frase;
+    }
+    if (Math.abs(v) < 0.5) { ver.className = 'veredito'; ver.innerHTML = '<span class="vlinha">Realizado em linha com o orçado</span>'; vp.hidden = true; }
+    else if (v > 0) { bloco('Saving', 'bom', p != null ? '<b>' + esc(pt) + '</b> abaixo do orçado' : 'Abaixo do orçado'); }
+    else { bloco('Estouro', 'ruim', p != null ? '<b>' + esc(pt) + '</b> acima do orçado' : 'Sem orçamento previsto'); }
+    $('contexto').innerHTML = esc(quem) + ' <span>' + esc(emPeriodo() + ' de ' + b.ano) + '</span>';
+    $('k-orc').textContent = f0(tot[1]); $('k-real').textContent = f0(tot[0]);
+    $('k-var').textContent = sinal(v); $('k-var').className = 'num ' + cls(v);
 
-    /* =========================
-       TELA DE SUCESSO
-       ========================= */
+    // destaques
+    var lista = Object.keys(porCC).map(function (k) { return { i: +k, real: porCC[k][0], orc: porCC[k][1], v: porCC[k][0] - porCC[k][1] }; });
+    var d = '';
+    if (S.cc < 0) {
+      var melhor = lista.slice().sort(function (a, c) { return c.v - a.v; })[0], pior = lista.slice().sort(function (a, c) { return a.v - c.v; })[0];
+      if (melhor && melhor.v > 0.5) d += '<li class="bom"><small>Maior saving</small><b>' + esc(b.ccs[melhor.i]) + '</b> <span class="num">' + rs(melhor.v) + '</span></li>';
+      if (pior && pior.v < -0.5) d += '<li class="ruim"><small>Maior estouro</small><b>' + esc(b.ccs[pior.i]) + '</b> <span class="num">' + rs(pior.v) + '</span></li>';
+    } else {
+      var pl = Object.keys(pac).filter(function (k) { return pac[k][2] === 'P'; }).map(function (k) { return { n: +k, v: pac[k][0] - pac[k][1] }; });
+      var pm = pl.slice().sort(function (a, c) { return c.v - a.v; })[0], pp = pl.slice().sort(function (a, c) { return a.v - c.v; })[0];
+      if (pm && pm.v > 0.5) d += '<li class="bom"><small>Pacote com maior saving</small><b>' + esc(b.nomes[pm.n]) + '</b> <span class="num">' + rs(pm.v) + '</span></li>';
+      if (pp && pp.v < -0.5) d += '<li class="ruim"><small>Pacote com maior estouro</small><b>' + esc(b.nomes[pp.n]) + '</b> <span class="num">' + rs(pp.v) + '</span></li>';
+    }
+    $('destaques').innerHTML = d;
 
-    document.body.innerHTML = `
+    desenharGrafico(porMes, ms);
 
-      <div style="
-        min-height:100vh;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        background:#f4f6f8;
-        font-family:Verdana,sans-serif;
-        padding:30px;
-      ">
+    // centros de custo
+    lista.sort(function (a, c) { return Math.abs(c.orc) + Math.abs(c.real) - Math.abs(a.orc) - Math.abs(a.real); });
+    var maxR = 1; lista.forEach(function (x) { maxR = Math.max(maxR, Math.max(0, -x.orc), Math.max(0, -x.real)); });
+    var tc = '', tAll = [0, 0];
+    lista.forEach(function (x) {
+      tAll[0] += x.real; tAll[1] += x.orc;
+      var wr = Math.max(0, -x.real) / maxR * 100, wo = Math.max(0, -x.orc) / maxR * 100;
+      tc += '<tr' + (x.i === S.cc ? ' class="sel"' : '') + '><td><button class="linkrow" type="button" data-cc="' + x.i + '">' + esc(b.ccs[x.i]) + '</button></td>' +
+        '<td class="num">' + f0(x.orc) + '</td><td class="num">' + f0(x.real) + '</td><td class="num ' + cls(x.v) + '">' + sinal(x.v) + '</td><td class="num ' + cls(x.v) + '">' + fpct(pct(x.v, x.orc)) + '</td>' +
+        '<td class="regua-c"><div class="regua' + (x.v < -0.5 ? ' ruim' : '') + '" role="img" aria-label="Realizado ' + f0(x.real) + ' de ' + f0(x.orc) + ' orçado"><i style="width:' + wr.toFixed(1) + '%"></i>' + (x.orc ? '<b style="left:' + wo.toFixed(1) + '%"></b>' : '') + '</div></td></tr>';
+    });
+    var vAll = tAll[0] - tAll[1];
+    tc += '<tr class="total"><td>Total</td><td class="num">' + f0(tAll[1]) + '</td><td class="num">' + f0(tAll[0]) + '</td><td class="num ' + cls(vAll) + '">' + sinal(vAll) + '</td><td class="num ' + cls(vAll) + '">' + fpct(pct(vAll, tAll[1])) + '</td><td></td></tr>';
+    $('tb-cc').innerHTML = tc;
+    $('cc-sub').textContent = 'Total OBZ de cada centro de custo ' + emPeriodo() + '. Clique em um nome para ver só ele no restante da página.';
 
-        <div style="
-          background:white;
-          max-width:700px;
-          width:100%;
-          border-radius:25px;
-          padding:60px;
-          box-shadow:0 0 25px rgba(0,0,0,0.08);
-          text-align:center;
-        ">
+    // pacotes
+    var chaves = Object.keys(pac).map(Number);
+    var dentro = chaves.filter(function (k) { return pac[k][2] === 'P'; }).sort(function (a, c) { return Math.abs(pac[c][0]) + Math.abs(pac[c][1]) - Math.abs(pac[a][0]) - Math.abs(pac[a][1]); });
+    var fora = chaves.filter(function (k) { return pac[k][2] === 'N'; });
+    var tp = '';
+    function linhaPac(k, extra) {
+      var x = pac[k], vv = x[0] - x[1], cs = contas[k] || {}, ids = Object.keys(cs).map(Number), aberto = S.abertos.has(k);
+      var nome = ids.length ? '<button class="abre" type="button" data-pac="' + k + '" aria-expanded="' + aberto + '"><span class="seta" aria-hidden="true">▸</span>' + esc(b.nomes[k]) + '</button>' : '<b style="font-weight:600;padding-left:calc(.7em + 8px)">' + esc(b.nomes[k]) + '</b>';
+      var r = '<tr class="' + extra + '"><td>' + nome + '</td><td class="num">' + f0(x[1]) + '</td><td class="num">' + f0(x[0]) + '</td><td class="num ' + cls(vv) + '">' + sinal(vv) + '</td><td class="num ' + cls(vv) + '">' + fpct(pct(vv, x[1])) + '</td></tr>';
+      if (aberto) ids.sort(function (a, c) { return Math.abs(cs[c][0]) + Math.abs(cs[c][1]) - Math.abs(cs[a][0]) - Math.abs(cs[a][1]); }).forEach(function (n) {
+        var y = cs[n], w = y[0] - y[1];
+        r += '<tr class="conta"><td>' + esc(b.nomes[n]) + '</td><td class="num">' + f0(y[1]) + '</td><td class="num">' + f0(y[0]) + '</td><td class="num ' + cls(w) + '">' + sinal(w) + '</td><td class="num ' + cls(w) + '">' + fpct(pct(w, y[1])) + '</td></tr>';
+      });
+      return r;
+    }
+    dentro.forEach(function (k) { tp += linhaPac(k, ''); });
+    tp += '<tr class="total"><td>Total OBZ</td><td class="num">' + f0(tot[1]) + '</td><td class="num">' + f0(tot[0]) + '</td><td class="num ' + cls(v) + '">' + sinal(v) + '</td><td class="num ' + cls(v) + '">' + fpct(p) + '</td></tr>';
+    fora.forEach(function (k) { tp += linhaPac(k, 'fora'); });
+    $('tb-pac').innerHTML = tp;
+    $('pac-sub').textContent = (S.cc < 0 ? 'Todos os centros de custo' : b.ccs[S.cc]) + ' ' + emPeriodo() + '. Abra um pacote para ver as contas.';
+    var notas = [];
+    if (fora.length) notas.push('As linhas em cinza abaixo do total (como Depreciação e Amortização) existem na base, mas não entram no Total OBZ.');
+    if (cbz[0] || cbz[1]) notas.push('Fora do OBZ, os custos (Total CBZ) somam ' + f0(cbz[0]) + ' de realizado contra ' + f0(cbz[1]) + ' de orçado neste recorte.');
+    $('pac-nota').textContent = notas.join(' ');
 
-          <img
-            src="Logo CPQ.png"
-            style="width:300px; margin-bottom:5px;"
-          >
+    S.porCC = porCC; desenharJust();
 
-          <h1 style="
-            color:#2e7d32;
-            font-size:42px;
-            margin-bottom:10px;
-          ">
-            🎉 Inscrição realizada!
-          </h1>
-
-
-          <p style="
-            font-size:22px;
-            line-height:1.8;
-            color:#333;
-          ">
-
-            Parabéns,
-            <strong>${nome}</strong>!
-
-            <br><br>
-
-            Sua inscrição foi confirmada com sucesso.
-
-            <br><br>
-
-            Anote sua data de participação
-            e aguarde futuras orientações
-            da equipe de Ensino.
-
-          </p>
-
-
-          <div style="
-            margin-top:35px;
-            background:#eef5ff;
-            padding:25px;
-            border-radius:18px;
-            font-size:22px;
-            color:#1f3c5c;
-            font-weight:bold;
-          ">
-
-            📅 Sua participação será em:
-
-            <br><br>
-
-            ${dataParticipacao}
-
-            <br><br>
-
-            📍 Local: Cozinha Escola - SP
-
-            <br><br>
-
-            Rua Fernandes Moreira, 1472
-
-            <br>
-
-            Chácara Santo Antônio.
-
-          </div>
-
-
-        </div>
-
-      </div>
-
-    `;
-
-
+    // conferência
+    var av = Array.isArray(b.avisos) ? b.avisos : [];
+    $('confere').hidden = !av.length;
+    $('confere-n').textContent = av.length === 1 ? '1 ponto para conferir na base' : av.length + ' pontos para conferir na base';
+    $('confere-lista').innerHTML = av.map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('');
   }
 
-  catch (erro) {
-
-    console.log(erro);
-
-    alert(
-      "Erro ao enviar inscrição."
-    );
-
+  var PER_NOME = MESES_NOME.concat(['1º semestre', '2º semestre']);
+  function entradas(base) {
+    try { var j = JSON.parse(base.just || '{}'); return j && j.v === 2 && Array.isArray(j.e) ? j.e.filter(function (e) { return Array.isArray(e) && Array.isArray(e[4]); }) : []; } catch (e) { return []; }
+  }
+  function ordPer(m) { return m < 12 ? m : m === 12 ? 5.5 : 11.5; }
+  function perOk(m) {
+    if (S.periodo === 'ano') return true;
+    if (S.periodo === 's1') return m < 6 || m === 12;
+    if (S.periodo === 's2') return (m >= 6 && m < 12) || m === 13;
+    return m === +S.periodo;
+  }
+  // histórico: mantém as justificativas de períodos que o arquivo novo não traz
+  function mesclarHist(novo, antigo) {
+    if (!antigo || antigo.ano !== novo.ano) return;
+    var en = entradas(novo), ea = entradas(antigo), tem = new Set(), idx = {};
+    en.forEach(function (e) { tem.add(e[0]); });
+    novo.ccs.forEach(function (n, i) { idx[norm(n)] = i; });
+    ea.forEach(function (e) {
+      if (tem.has(e[0])) return;
+      var c = e[1] < 0 ? -1 : idx[norm(antigo.ccs[e[1]])];
+      if (c === undefined) return;
+      en.push([e[0], c, e[2], e[3], e[4]]);
+    });
+    novo.just = JSON.stringify({ v: 2, e: en });
+  }
+  function desenharJust() {
+    var b = S.base, porCC = S.porCC || {}, q = norm(S.jBusca);
+    var base = S.just.filter(function (e) { return perOk(e[0]) && (S.cc < 0 || e[1] === S.cc) && (e[1] < b.ccs.length); });
+    var pacs = Array.from(new Set(base.map(function (e) { return e[2]; }))).sort(function (x, y) { return x.localeCompare(y, 'pt-BR'); });
+    if (S.jPac && pacs.indexOf(S.jPac) < 0) S.jPac = '';
+    $('just-pac').innerHTML = '<option value="">Todos os pacotes</option>' + pacs.map(function (p) { return '<option' + (p === S.jPac ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join('');
+    var lista = base.filter(function (e) {
+      if (S.jPac && e[2] !== S.jPac) return false;
+      if (!q) return true;
+      return norm(e[2] + ' ' + e[3] + ' ' + e[4].map(function (l) { return l[1]; }).join(' ')).indexOf(q) >= 0;
+    });
+    $('just-sub').textContent = (lista.length === 1 ? '1 justificativa' : lista.length + ' justificativas') + ' ' + emPeriodo() + (S.cc < 0 ? '' : ', ' + b.ccs[S.cc]) + '. Os textos vêm do Excel enviado ao painel.';
+    if (!lista.length) {
+      $('just').innerHTML = '<p class="jvazio">' + (!S.just.length ? 'Nenhuma justificativa encontrada no Excel. Preencha a aba “Justificativas” do Excel, uma linha por justificativa.' : 'Nenhuma justificativa para este filtro. Troque o período, o centro de custo, o pacote ou a busca.') + '</p>';
+      return;
+    }
+    var grupos = {};
+    lista.forEach(function (e) { (grupos[e[1]] || (grupos[e[1]] = [])).push(e); });
+    var chaves = Object.keys(grupos).map(Number).sort(function (x, y) { return x < 0 ? 1 : y < 0 ? -1 : b.ccs[x].localeCompare(b.ccs[y], 'pt-BR'); });
+    var LIM = 3, h = '';
+    chaves.forEach(function (i) {
+      var es = grupos[i].map(function (e, n) { return [e, n]; }).sort(function (x, y) { return ordPer(y[0][0]) - ordPer(x[0][0]) || x[1] - y[1]; }).map(function (x) { return x[0]; });
+      var aberto = S.cc >= 0 || !!q || S.justAbertos.has(i), x = porCC[i], selo = '';
+      if (x) { var v = x[0] - x[1]; if (Math.abs(v) >= 0.5) selo = '<span class="jselo ' + (v > 0 ? 'pos' : 'neg') + '">' + (v > 0 ? 'Saving de ' : 'Estouro de ') + rs(v) + ' ' + esc(emPeriodo()) + '</span>'; }
+      h += '<article class="jcard"><h3>' + esc(i < 0 ? 'Diretoria (geral)' : b.ccs[i]) + '</h3>' + selo + '<div class="jtxt">';
+      var perAtual = null;
+      (aberto ? es : es.slice(0, LIM)).forEach(function (e) {
+        if (e[0] !== perAtual) { perAtual = e[0]; h += '<p class="jper">' + esc(PER_NOME[e[0]] || '') + '</p>'; }
+        h += '<h4>' + esc(e[2]) + (e[3] ? ' <span class="jv num">' + esc(e[3]) + '</span>' : '') + '</h4>';
+        e[4].forEach(function (ln) {
+          var t = ln[0], s = esc(ln[1]);
+          h += t === 's' ? '<p class="jsub">' + s + '</p>' : t === 'b' ? '<p class="jb">' + s + '</p>' : t === 'v' ? '<p class="jval num">' + s + '</p>' : '<p>' + s + '</p>';
+        });
+      });
+      h += '</div>';
+      if (S.cc < 0 && !q && es.length > LIM) h += '<button class="jmais" type="button" data-just="' + i + '" aria-expanded="' + aberto + '">' + (aberto ? 'Mostrar menos' : 'Mostrar tudo (' + es.length + ' justificativas)') + '</button>';
+      h += '</article>';
+    });
+    $('just').innerHTML = h;
   }
 
-}
+  function desenharGrafico(porMes, ms) {
+    var box = $('grafico'), b = S.base, W = Math.max(300, box.clientWidth - 20), H = 230, mL = 46, mB = 24, mT = 10;
+    var meses = b.meses, max = 1;
+    var dados = meses.map(function (m) { var x = porMes[m] || [0, 0]; var o = { m: m, real: Math.max(0, -x[0]), orc: Math.max(0, -x[1]), r0: x[0], o0: x[1] }; max = Math.max(max, o.real, o.orc); return o; });
+    var passo = Math.pow(10, Math.floor(Math.log10(max))); if (max / passo < 2) passo /= 5; else if (max / passo < 5) passo /= 2;
+    var topo = Math.ceil(max / passo) * passo, ih = H - mT - mB, iw = W - mL - 6;
+    var y = function (val) { return mT + ih - val / topo * ih; };
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Gasto orçado e realizado mês a mês">';
+    for (var t = 0; t <= topo + 1; t += passo) {
+      s += '<line x1="' + mL + '" x2="' + W + '" y1="' + y(t) + '" y2="' + y(t) + '" stroke="var(--line)" stroke-width="1"/>';
+      s += '<text x="' + (mL - 6) + '" y="' + (y(t) + 4) + '" text-anchor="end">' + (t >= 1000 ? f0(t / 1000) + ' mil' : f0(t)) + '</text>';
+    }
+    var slot = iw / dados.length, bw = Math.min(26, slot * 0.32);
+    dados.forEach(function (dd, i) {
+      var cx = mL + slot * i + slot / 2, ruim = dd.real > dd.orc + 0.5;
+      s += '<g class="mes' + (ms.has(dd.m) ? '' : ' fraco') + '" tabindex="0" role="button" data-m="' + dd.m + '" aria-label="' + MESES_NOME[dd.m] + ': orçado ' + f0(dd.o0) + ', realizado ' + f0(dd.r0) + '">' +
+        '<rect class="alvo" x="' + (cx - slot / 2) + '" y="' + mT + '" width="' + slot + '" height="' + ih + '" fill="transparent"/>' +
+        '<rect x="' + (cx - bw - 1.5) + '" y="' + y(dd.orc) + '" width="' + bw + '" height="' + Math.max(0, mT + ih - y(dd.orc)) + '" fill="var(--semola)" rx="2"/>' +
+        '<rect x="' + (cx + 1.5) + '" y="' + y(dd.real) + '" width="' + bw + '" height="' + Math.max(0, mT + ih - y(dd.real)) + '" fill="' + (ruim ? 'var(--tomato)' : 'var(--basil)') + '" rx="2"/>' +
+        '<text x="' + cx + '" y="' + (H - 6) + '" text-anchor="middle">' + MES_ABR[dd.m] + '</text></g>';
+    });
+    s += '</svg><div class="dica" id="dica" hidden></div>';
+    box.innerHTML = s;
+    S.dadosGraf = dados;
+    $('graf-sub').textContent = (S.cc < 0 ? 'Todos os centros de custo' : b.ccs[S.cc]) + ', gasto pelo Total OBZ em R$. Clique em um mês para ver só ele.';
+  }
+  function mostrarDica(g) {
+    var dica = $('dica'), box = $('grafico'); if (!dica) return;
+    var m = +g.getAttribute('data-m'), dd = (S.dadosGraf || []).filter(function (x) { return x.m === m; })[0]; if (!dd) return;
+    var v = dd.r0 - dd.o0;
+    dica.innerHTML = '<b>' + MESES_NOME[m] + '</b><br>Orçado ' + f0(dd.o0) + '<br>Realizado ' + f0(dd.r0) + '<br>' + (v >= 0 ? 'Saving ' : 'Estouro ') + f0(Math.abs(v));
+    dica.hidden = false;
+    var gb = g.getBoundingClientRect(), bb = box.getBoundingClientRect();
+    var left = gb.left - bb.left + gb.width / 2 - dica.offsetWidth / 2;
+    dica.style.left = Math.max(4, Math.min(left, bb.width - dica.offsetWidth - 4)) + 'px';
+    dica.style.top = '6px';
+  }
+
+  /* ----- eventos ----- */
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-p],[data-cc],[data-pac],[data-just],.mes');
+    if (!t || !S.base) return;
+    if (t.hasAttribute('data-p')) S.periodo = t.getAttribute('data-p');
+    else if (t.hasAttribute('data-cc')) { var c = +t.getAttribute('data-cc'); S.cc = S.cc === c ? -1 : c; }
+    else if (t.hasAttribute('data-pac')) { var k = +t.getAttribute('data-pac'); if (S.abertos.has(k)) S.abertos.delete(k); else S.abertos.add(k); }
+    else if (t.hasAttribute('data-just')) { var ji = +t.getAttribute('data-just'); if (S.justAbertos.has(ji)) S.justAbertos.delete(ji); else S.justAbertos.add(ji); }
+    else if (t.classList.contains('mes')) { var m = t.getAttribute('data-m'); S.periodo = S.periodo === m ? 'ano' : m; }
+    desenhar();
+  });
+  document.addEventListener('keydown', function (e) {
+    var g = e.target.closest && e.target.closest('.mes');
+    if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); g.dispatchEvent(new MouseEvent('click', { bubbles: true })); }
+  });
+  ['pointerover', 'focusin'].forEach(function (ev) { $('grafico').addEventListener(ev, function (e) { var g = e.target.closest('.mes'); if (g) mostrarDica(g); }); });
+  ['pointerleave', 'focusout'].forEach(function (ev) { $('grafico').addEventListener(ev, function () { var d = $('dica'); if (d) d.hidden = true; }); });
+  $('sel-cc').addEventListener('change', function () { S.cc = +this.value; desenhar(); });
+  $('just-pac').addEventListener('change', function () { S.jPac = this.value; if (S.base) desenharJust(); });
+  $('just-busca').addEventListener('input', function () { S.jBusca = this.value; if (S.base) desenharJust(); });
+  var rz; window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { if (S.base) desenhar(); }, 150); });
+
+  /* ----- envio do Excel ----- */
+  var dlg = $('dlg');
+  function abrirSeletor() { $('arquivo').value = ''; $('arquivo').click(); }
+  $('btn-enviar').addEventListener('click', abrirSeletor);
+  $('btn-enviar-vazio').addEventListener('click', abrirSeletor);
+  $('arquivo').addEventListener('change', function () { if (this.files && this.files[0]) lerArquivo(this.files[0]); });
+  document.addEventListener('dragover', function (e) { if (S.podeEnviar) { e.preventDefault(); document.body.classList.add('solta'); } });
+  document.addEventListener('dragleave', function () { document.body.classList.remove('solta'); });
+  document.addEventListener('drop', function (e) {
+    document.body.classList.remove('solta');
+    if (!S.podeEnviar) return; e.preventDefault();
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) lerArquivo(f);
+  });
+  function dlgEstado(titulo, corpo, podeConfirmar) {
+    $('dlg-titulo').textContent = titulo; $('dlg-corpo').innerHTML = corpo;
+    $('dlg-ok').hidden = !podeConfirmar; $('dlg-ok').disabled = false;
+    $('dlg-ok').textContent = S.db ? 'Publicar esta base' : 'Usar nesta tela';
+    if (!dlg.open) dlg.showModal();
+  }
+  function lerPlanilha(buf, nomeArq) {
+    var wb = XLSX.read(buf, { type: 'array' }), nomes = wb.SheetNames || [];
+    var alvo = nomes.filter(function (n) { var k = norm(n); return k.indexOf('BASE') >= 0 && k.indexOf('DRE') >= 0; })[0];
+    var candidatas = alvo ? [alvo] : nomes, base = null, erro = null;
+    for (var i = 0; i < candidatas.length && !base; i++) {
+      var ws = wb.Sheets[candidatas[i]]; if (!ws) continue;
+      var rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null, blankrows: false });
+      try { base = lerBase(rows, nomeArq); } catch (er) { erro = er; }
+    }
+    if (!base) throw erro || new Error('Não encontrei a aba “BASE (DRE)” nesse arquivo.');
+    var just = [];
+    try {
+      var pls = nomes.filter(function (n) { return n !== alvo && wb.Sheets[n]; }).map(function (n) {
+        return { nome: n, rows: XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: true, defval: null, blankrows: true }) };
+      });
+      just = lerJustificativas(pls, base.ccs, base.meses[base.meses.length - 1]);
+      if (!/20\d{2}/.test(nomeArq)) {
+        var capa = pls.filter(function (x) { return norm(x.nome) === 'CAPA'; })[0];
+        var m = capa && JSON.stringify(capa.rows).match(/20\d{2}/); if (m) base.ano = +m[0];
+      }
+    } catch (e) {}
+    base.just = JSON.stringify({ v: 2, e: just });
+    return base;
+  }
+  function lerArquivo(file) {
+    S.pendente = null;
+    dlgEstado('Lendo o Excel…', '<p>' + esc(file.name) + '</p>', false);
+    if (typeof XLSX === 'undefined') { dlgEstado('Não foi possível ler o arquivo', '<p class="erro">O leitor de Excel não carregou. Recarregue a página e tente de novo.</p>', false); return; }
+    var fr = new FileReader();
+    fr.onerror = function () { dlgEstado('Não foi possível ler o arquivo', '<p class="erro">O navegador não conseguiu abrir esse arquivo.</p>', false); };
+    fr.onload = function () {
+      setTimeout(function () {
+        try {
+          var base = lerPlanilha(new Uint8Array(fr.result), file.name);
+          S.pendente = base;
+          var L = JSON.parse(base.linhas), real = 0, orc = 0;
+          L.forEach(function (l) { if (l[2] === 'T') { real += l[5]; orc += l[6]; } });
+          var ult = base.meses[base.meses.length - 1];
+          dlgEstado((S.db ? 'Conferir antes de publicar' : 'Conferir a base'),
+            '<dl><dt>Arquivo</dt><dd>' + esc(file.name) + '</dd><dt>Meses</dt><dd>' + MESES_NOME[base.meses[0]] + ' a ' + MESES_NOME[ult] + ' (' + base.meses.length + ')</dd><dt>Centros de custo</dt><dd>' + base.ccs.length + '</dd><dt>Orçado no ano</dt><dd class="num">' + f0(orc) + '</dd><dt>Realizado no ano</dt><dd class="num">' + f0(real) + '</dd></dl>' +
+            '<dl><dt>Justificativas</dt><dd>' + entradas(base).length + ' textos encontrados</dd></dl>' + (base.avisos.length ? '<p class="aviso-leve">' + base.avisos.length + (base.avisos.length === 1 ? ' ponto' : ' pontos') + ' para conferir na base. A lista aparece no fim da página.</p>' : '') +
+            (S.db ? '<p>Ao publicar, esta base substitui a anterior para todas as pessoas que abrem o painel.</p>' : (MODO === 'site' ? '<p>Esta base aparece só neste navegador e some ao recarregar. Para atualizar o site para todos, substitua o arquivo base.xlsx na pasta do site.</p>' : '<p>Sem conexão com o armazenamento do painel agora: a base aparece só nesta tela e some ao recarregar.</p>')), true);
+        } catch (er) {
+          dlgEstado('Não foi possível ler o arquivo', '<p class="erro">' + esc(er && er.message ? er.message : 'Arquivo em formato inesperado.') + '</p><p>O painel lê a aba “BASE (DRE)” com as colunas CENTRO DE CUSTO, PACOTE, REALIZADO, ORÇADO e MÊS.</p>', false);
+        }
+      }, 30);
+    };
+    fr.readAsArrayBuffer(file);
+  }
+  $('dlg-cancelar').addEventListener('click', function () { S.pendente = null; dlg.close(); });
+  $('dlg-ok').addEventListener('click', function () {
+    var base = S.pendente; if (!base) return;
+    if (!S.db) { dlg.close(); carregar(base, true); toast('Base carregada nesta tela'); return; }
+    $('dlg-ok').disabled = true; $('dlg-ok').textContent = 'Publicando…';
+    if (!S.local) mesclarHist(base, S.base);
+    S.db.doc('painel/atual').set(base).then(function () {
+      S.pendente = null; dlg.close(); carregar(base, false); toast('Base publicada');
+    }).catch(function (er) {
+      var semPermissao = er && er.code === 'invalid_argument';
+      dlgEstado('A base não foi publicada', '<p class="erro">' + (semPermissao ? 'Seu acesso a este painel não permite trocar a base. Peça a quem é dono ou editor.' : 'O armazenamento do painel não respondeu. Tente de novo em instantes.') + '</p>', !semPermissao);
+    });
+  });
+  var tt; function toast(msg) { var t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(function () { t.hidden = true; }, 3200); }
+
+  /* ----- carga da base ----- */
+  if (MODO === 'site') {
+    var ARQ = 'base.xlsx', modif = null;
+    fetch(ARQ, { cache: 'no-store' }).then(function (r) {
+      if (!r.ok) throw new Error('sem base');
+      modif = r.headers.get('last-modified');
+      return r.arrayBuffer();
+    }).then(function (buf) {
+      if (typeof XLSX === 'undefined') throw new Error('sem leitor');
+      var base = lerPlanilha(new Uint8Array(buf), ARQ);
+      if (modif && !isNaN(Date.parse(modif))) base.em = new Date(modif).toISOString();
+      if (!S.base) carregar(base, false);
+    }).catch(function () { if (!S.base) desenhar(); });
+    return;
+  }
+  var espera = setTimeout(function () { if (!S.base) desenhar(); }, 10000);
+  function semDb() { clearTimeout(espera); if (!S.base) desenhar(); }
+  if (!window.claude || typeof window.claude.use !== 'function') { semDb(); return; }
+  Promise.all([window.claude.use('db'), window.claude.use('user')]).then(function (r) {
+    var db = r[0], user = r[1];
+    if (user && typeof user.canEdit === 'function') {
+      Promise.resolve(user.canEdit()).then(function (ok) { if (ok === false) { S.podeEnviar = false; if ($('carregando').hidden) desenhar(); } }).catch(function () {});
+    }
+    if (!db) { semDb(); return; }
+    S.db = db;
+    db.doc('painel/atual').onSnapshot(function (snap) {
+      clearTimeout(espera);
+      var d = snap.exists ? snap.data() : null;
+      if (d && d.linhas && (!S.base || S.local || d.em !== S.base.em || d.just !== S.base.just)) carregar(d, false);
+      else if (!S.base) desenhar();
+    }, function () { semDb(); });
+  }).catch(semDb);
+})();
 
 </script>
-
 </body>
 </html>
-
-
