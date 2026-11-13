@@ -131,6 +131,7 @@ td.regua-c{min-width:170px;width:22%}
 .jper:first-child{margin-top:0 !important}
 .jper + h4{margin-top:4px;padding-top:0;border-top:0}
 .jv{font-weight:600;color:var(--muted);white-space:nowrap}
+.jv.pos{color:var(--basil)} .jv.neg{color:var(--tomato)}
 .jtxt .jb{font-weight:600;margin-top:8px}
 .jvazio{color:var(--muted);margin:0;padding:18px;border:1px dashed var(--line);border-radius:14px;max-width:70ch}
 details.confere{margin-top:40px;background:var(--semola-soft);border-radius:14px;padding:14px 18px}
@@ -722,8 +723,29 @@ function lerJustificativas(planilhas, ccs, mesPadrao) {
     });
     novo.just = JSON.stringify({ v: 2, e: en });
   }
+  // cor do valor ao lado do pacote: compara realizado x orçado daquele pacote, centro de custo e período na base
+  function chavePac(x) { return compacto(PAC_NOTA[compacto(x)] || x); }
+  function variacoesPac() {
+    var mapa = {}, nomes = S.base.nomes || [];
+    S.linhas.forEach(function (l) {
+      if (l[2] !== 'P' && l[2] !== 'N') return;
+      var kp = chavePac(nomes[l[3]] || '');
+      [l[0], -1].forEach(function (cc) {
+        var k = cc + '|' + l[1] + '|' + kp, a = mapa[k] || (mapa[k] = [0, 0]);
+        a[0] += l[5]; a[1] += l[6];
+      });
+    });
+    return mapa;
+  }
+  function corPac(mapa, e) {
+    var ms = e[0] === 12 ? [0, 1, 2, 3, 4, 5] : e[0] === 13 ? [6, 7, 8, 9, 10, 11] : [e[0]], kp = chavePac(e[2]), real = 0, orc = 0, achou = false;
+    ms.forEach(function (m) { var a = mapa[e[1] + '|' + m + '|' + kp]; if (a) { achou = true; real += a[0]; orc += a[1]; } });
+    if (!achou) return '';
+    var v = real - orc;
+    return v >= 0.5 ? ' pos' : v <= -0.5 ? ' neg' : '';
+  }
   function desenharJust() {
-    var b = S.base, porCC = S.porCC || {}, q = norm(S.jBusca);
+    var b = S.base, porCC = S.porCC || {}, q = norm(S.jBusca), varPac = variacoesPac();
     var base = S.just.filter(function (e) { return perOk(e[0]) && (S.cc < 0 || e[1] === S.cc) && (e[1] < b.ccs.length); });
     var pacs = Array.from(new Set(base.map(function (e) { return e[2]; }))).sort(function (x, y) { return x.localeCompare(y, 'pt-BR'); });
     if (S.jPac && pacs.indexOf(S.jPac) < 0) S.jPac = '';
@@ -750,7 +772,7 @@ function lerJustificativas(planilhas, ccs, mesPadrao) {
       var perAtual = null;
       (aberto ? es : es.slice(0, LIM)).forEach(function (e) {
         if (e[0] !== perAtual) { perAtual = e[0]; h += '<p class="jper">' + esc(PER_NOME[e[0]] || '') + '</p>'; }
-        h += '<h4>' + esc(e[2]) + (e[3] ? ' <span class="jv num">' + esc(e[3]) + '</span>' : '') + '</h4>';
+        h += '<h4>' + esc(e[2]) + (e[3] ? ' <span class="jv num' + corPac(varPac, e) + '">' + esc(e[3]) + '</span>' : '') + '</h4>';
         e[4].forEach(function (ln) {
           var t = ln[0], s = esc(ln[1]);
           h += t === 's' ? '<p class="jsub">' + s + '</p>' : t === 'b' ? '<p class="jb">' + s + '</p>' : t === 'v' ? '<p class="jval num">' + s + '</p>' : '<p>' + s + '</p>';
