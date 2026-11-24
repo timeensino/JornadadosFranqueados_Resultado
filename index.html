@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
 <title>Controle orçamentário — Diretoria de Jornada dos Franqueados</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Public+Sans:wght@400;600;700&display=swap">
 <style>
@@ -155,6 +156,17 @@ dialog .acoes .btn{margin-top:0}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;z-index:20;max-width:calc(100vw - 32px)}
 .toast[hidden]{display:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.cadeado{max-width:420px;margin:56px auto 0;padding:28px 24px;background:var(--surface);border:1px solid var(--line);border-radius:18px}
+.cadeado h2{font-size:1.5rem;margin-bottom:6px}
+.cadeado p{color:var(--muted);margin:0 0 14px}
+.cadeado form{display:flex;flex-direction:column;gap:10px}
+.cadeado input[type=password],.cadeado input[type=file]{border:1px solid var(--line);background:var(--bg);padding:10px 12px;border-radius:10px;width:100%}
+.cadeado .btn{margin-top:4px;justify-content:center}
+.cadeado details{margin-top:22px;border-top:1px solid var(--line);padding-top:14px;font-size:.9rem}
+.cadeado summary{cursor:pointer;font-weight:600;color:var(--muted)}
+.cadeado details form{margin-top:12px}
+.cadeado details p{margin:8px 0 0;font-size:.85rem}
+.cadeado .ok{color:var(--basil);font-weight:600}
 @media (max-width:760px){
   .resultado{grid-template-columns:1fr}
   .base-info{text-align:left;max-width:none}
@@ -181,9 +193,31 @@ dialog .acoes .btn{margin-top:0}
 
   <p id="carregando" class="contexto" style="margin-top:32px">Carregando a base…</p>
 
+  <div id="cadeado" class="cadeado" hidden>
+    <h2>Acesso restrito</h2>
+    <p>Digite a senha para ver o controle orçamentário.</p>
+    <form id="form-senha" autocomplete="off">
+      <label class="sr" for="senha">Senha</label>
+      <input type="password" id="senha" placeholder="Senha" autocomplete="current-password" required>
+      <button class="btn" type="submit" id="btn-entrar">Entrar</button>
+      <p class="erro" id="cad-erro" role="alert"></p>
+    </form>
+    <details>
+      <summary>Atualizar a base (para quem administra o painel)</summary>
+      <form id="form-gerar">
+        <p>Escolha o Excel do mês e a senha de acesso. O painel gera o arquivo <b>base.enc</b>. Suba esse arquivo no GitHub, no lugar do anterior.</p>
+        <input type="file" id="g-arq" accept=".xlsx,.xlsm,.xls" required>
+        <input type="password" id="g-senha" placeholder="Senha de acesso" autocomplete="new-password" required>
+        <input type="password" id="g-senha2" placeholder="Repita a senha" autocomplete="new-password" required>
+        <button class="btn sec" type="submit" id="btn-gerar">Gerar base.enc</button>
+        <p id="g-msg" role="status"></p>
+      </form>
+    </details>
+  </div>
+
   <div id="vazio" class="vazio" hidden>
     <h2>Nenhuma base carregada ainda</h2>
-    <p>Coloque o Excel do controle orçamentário na mesma pasta do site, com o nome base.xlsx. Ou abra um arquivo agora para ver os resultados só neste navegador.</p>
+    <p>Gere o arquivo base.enc na tela de senha e coloque-o na mesma pasta do site. Ou abra um arquivo agora para ver os resultados só neste navegador.</p>
     <p id="vazio-leitor" hidden>Só quem é dono ou editor deste painel pode enviar a base.</p>
     <button class="btn" id="btn-enviar-vazio" type="button">Abrir Excel</button>
   </div>
@@ -907,7 +941,7 @@ function lerJustificativas(planilhas, ccs, mesPadrao) {
           dlgEstado((S.db ? 'Conferir antes de publicar' : 'Conferir a base'),
             '<dl><dt>Arquivo</dt><dd>' + esc(file.name) + '</dd><dt>Meses</dt><dd>' + MESES_NOME[base.meses[0]] + ' a ' + MESES_NOME[ult] + ' (' + base.meses.length + ')</dd><dt>Centros de custo</dt><dd>' + base.ccs.length + '</dd><dt>Orçado no ano</dt><dd class="num">' + f0(orc) + '</dd><dt>Realizado no ano</dt><dd class="num">' + f0(real) + '</dd></dl>' +
             '<dl><dt>Justificativas</dt><dd>' + entradas(base).length + ' textos encontrados</dd></dl>' + (base.avisos.length ? '<p class="aviso-leve">' + base.avisos.length + (base.avisos.length === 1 ? ' ponto' : ' pontos') + ' para conferir na base. A lista aparece no fim da página.</p>' : '') +
-            (S.db ? '<p>Ao publicar, esta base substitui a anterior para todas as pessoas que abrem o painel.</p>' : (MODO === 'site' ? '<p>Esta base aparece só neste navegador e some ao recarregar. Para atualizar o site para todos, substitua o arquivo base.xlsx na pasta do site.</p>' : '<p>Sem conexão com o armazenamento do painel agora: a base aparece só nesta tela e some ao recarregar.</p>')), true);
+            (S.db ? '<p>Ao publicar, esta base substitui a anterior para todas as pessoas que abrem o painel.</p>' : (MODO === 'site' ? '<p>Esta base aparece só neste navegador e some ao recarregar. Para atualizar o site para todos, gere um novo base.enc na tela de senha e substitua o arquivo na pasta do site.</p>' : '<p>Sem conexão com o armazenamento do painel agora: a base aparece só nesta tela e some ao recarregar.</p>')), true);
         } catch (er) {
           dlgEstado('Não foi possível ler o arquivo', '<p class="erro">' + esc(er && er.message ? er.message : 'Arquivo em formato inesperado.') + '</p><p>O painel lê a aba “BASE (DRE)” com as colunas CENTRO DE CUSTO, PACOTE, REALIZADO, ORÇADO e MÊS.</p>', false);
         }
@@ -931,18 +965,90 @@ function lerJustificativas(planilhas, ccs, mesPadrao) {
   var tt; function toast(msg) { var t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(function () { t.hidden = true; }, 3200); }
 
   /* ----- carga da base ----- */
+  /* ----- senha: a base fica criptografada (AES-GCM, chave derivada da senha) ----- */
+  var MAGIC = [79, 66, 90, 49]; // "OBZ1"
+  function chaveDe(senha, sal, uso) {
+    return crypto.subtle.importKey('raw', new TextEncoder().encode(senha), 'PBKDF2', false, ['deriveKey']).then(function (k) {
+      return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: sal, iterations: 310000, hash: 'SHA-256' }, k, { name: 'AES-GCM', length: 256 }, false, [uso]);
+    });
+  }
+  function cifrar(bytes, nome, senha) {
+    var sal = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    var n = new TextEncoder().encode(nome), claro = new Uint8Array(4 + n.length + bytes.length);
+    new DataView(claro.buffer).setUint32(0, n.length); claro.set(n, 4); claro.set(bytes, 4 + n.length);
+    return chaveDe(senha, sal, 'encrypt').then(function (k) { return crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, k, claro); }).then(function (ct) {
+      var out = new Uint8Array(32 + ct.byteLength); out.set(MAGIC, 0); out.set(sal, 4); out.set(iv, 20); out.set(new Uint8Array(ct), 32); return out;
+    });
+  }
+  function decifrar(buf, senha) {
+    for (var i = 0; i < 4; i++) if (buf[i] !== MAGIC[i]) return Promise.reject(new Error('formato'));
+    return chaveDe(senha, buf.slice(4, 20), 'decrypt').then(function (k) { return crypto.subtle.decrypt({ name: 'AES-GCM', iv: buf.slice(20, 32) }, k, buf.slice(32)); }).then(function (p) {
+      p = new Uint8Array(p); var len = new DataView(p.buffer).getUint32(0);
+      return { nome: new TextDecoder().decode(p.slice(4, 4 + len)), bytes: p.slice(4 + len) };
+    });
+  }
+  function guardar(k, v) { try { if (v == null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) {} }
+  function lembrada() { try { return sessionStorage.getItem('obz-senha'); } catch (e) { return null; } }
+
+  $('form-gerar').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = $('g-arq').files && $('g-arq').files[0], s1 = $('g-senha').value, s2 = $('g-senha2').value, msg = $('g-msg');
+    msg.className = '';
+    if (!f) return;
+    if (s1.length < 6) { msg.className = 'erro'; msg.textContent = 'Use uma senha com pelo menos 6 caracteres.'; return; }
+    if (s1 !== s2) { msg.className = 'erro'; msg.textContent = 'As duas senhas não são iguais.'; return; }
+    if (!window.crypto || !crypto.subtle) { msg.className = 'erro'; msg.textContent = 'Abra o site pelo endereço https para gerar a base.'; return; }
+    msg.textContent = 'Gerando…'; $('btn-gerar').disabled = true;
+    f.arrayBuffer().then(function (buf) {
+      var bytes = new Uint8Array(buf);
+      if (typeof XLSX !== 'undefined') lerPlanilha(bytes, f.name); // confere se o Excel é lido antes de gerar
+      return cifrar(bytes, f.name, s1);
+    }).then(function (out) {
+      var url = URL.createObjectURL(new Blob([out], { type: 'application/octet-stream' })), a = document.createElement('a');
+      a.href = url; a.download = 'base.enc'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      msg.className = 'ok'; msg.textContent = 'Pronto: base.enc baixado. Suba no GitHub, no lugar do anterior.';
+    }).catch(function (er) {
+      msg.className = 'erro'; msg.textContent = (er && er.message) ? er.message : 'Não foi possível gerar o arquivo.';
+    }).then(function () { $('btn-gerar').disabled = false; });
+  });
+
   if (MODO === 'site') {
-    var ARQ = 'base.xlsx', modif = null;
+    var ARQ = 'base.enc', modif = null, cifrado = null, esperando = null;
+    S.podeEnviar = false;
+    $('carregando').hidden = true; $('cadeado').hidden = false;
+    function entrar(senha, auto) {
+      var erro = $('cad-erro');
+      if (cifrado === false) { erro.textContent = 'A base protegida (base.enc) não foi encontrada na pasta do site.'; return; }
+      if (!cifrado) { esperando = senha; $('btn-entrar').disabled = true; $('btn-entrar').textContent = 'Carregando…'; return; }
+      if (!window.crypto || !crypto.subtle) { erro.textContent = 'Abra o site pelo endereço https.'; return; }
+      erro.textContent = ''; $('btn-entrar').disabled = true; $('btn-entrar').textContent = 'Abrindo…';
+      decifrar(cifrado, senha).then(function (r) {
+        if (typeof XLSX === 'undefined') throw new Error('O leitor de Excel não carregou. Recarregue a página.');
+        var base = lerPlanilha(r.bytes, r.nome);
+        if (modif && !isNaN(Date.parse(modif))) base.em = new Date(modif).toISOString();
+        guardar('obz-senha', senha);
+        $('cadeado').hidden = true; $('senha').value = '';
+        S.podeEnviar = true; carregar(base, false);
+      }).catch(function (er) {
+        guardar('obz-senha', null);
+        if (!auto) erro.textContent = er && er.name === 'OperationError' ? 'Senha incorreta.' : er && er.message === 'formato' ? 'O arquivo base.enc não está no formato esperado.' : (er && er.message) || 'Não foi possível abrir a base.';
+      }).then(function () { $('btn-entrar').disabled = false; $('btn-entrar').textContent = 'Entrar'; });
+    }
+    $('form-senha').addEventListener('submit', function (e) { e.preventDefault(); entrar($('senha').value, false); });
+    setTimeout(function () { try { $('senha').focus(); } catch (e) {} }, 50);
     fetch(ARQ, { cache: 'no-store' }).then(function (r) {
       if (!r.ok) throw new Error('sem base');
       modif = r.headers.get('last-modified');
       return r.arrayBuffer();
     }).then(function (buf) {
-      if (typeof XLSX === 'undefined') throw new Error('sem leitor');
-      var base = lerPlanilha(new Uint8Array(buf), ARQ);
-      if (modif && !isNaN(Date.parse(modif))) base.em = new Date(modif).toISOString();
-      if (!S.base) carregar(base, false);
-    }).catch(function () { if (!S.base) desenhar(); });
+      cifrado = new Uint8Array(buf);
+      var s = esperando || lembrada(); esperando = null;
+      if (s) entrar(s, !$('senha').value && s === lembrada());
+    }).catch(function () {
+      cifrado = false; $('btn-entrar').disabled = false; $('btn-entrar').textContent = 'Entrar';
+      $('cad-erro').textContent = 'A base protegida (base.enc) não foi encontrada na pasta do site.';
+    });
     return;
   }
   var espera = setTimeout(function () { if (!S.base) desenhar(); }, 10000);
