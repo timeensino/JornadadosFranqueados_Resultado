@@ -279,6 +279,7 @@ var PKG = new Set(['PESSOAL','OCUPACAO E GASTOS ESTRUTURAIS','MANUTENCAO E ALUGU
 var SELF = new Set(['FRETES E CARRETOS','DEPRECIACAO E AMORTIZACAO','RESULTADO DE EQUIVALENCIA PATRIMONIAL','RATEIO']);
 var FORA = new Set(['DEPRECIACAO E AMORTIZACAO','RESULTADO DE EQUIVALENCIA PATRIMONIAL','RATEIO']); // pacotes que não entram no Total OBZ
 var IGNORAR = new Set(['LUCRO BRUTO','DESEMPENHO OPERACIONAL','IMPOSTOS SOBRE VENDAS']);
+var ESCONDER = /^(DEPRECIACAO E AMORTIZACAO|DESEMPENHO OPERACIONAL)/; // linhas que não aparecem no painel
 
 function norm(s) {
   return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase();
@@ -331,6 +332,7 @@ function lerBase(rows, arquivo) {
   }
   var bloco = null, cc = -1, mi = -1, pend = [];
   function emitP(row, contas) {
+    if (ESCONDER.test(row.k)) return;
     var p = idNome(row.k, row.raw);
     add(cc, mi, FORA.has(row.k) ? 'N' : 'P', p, -1, row.real, row.orc);
     contas.forEach(function (a) { add(cc, mi, 'C', idNome(a.k, a.raw), p, a.real, a.orc); });
@@ -355,7 +357,7 @@ function lerBase(rows, arquivo) {
     var b = kcc + '|' + m;
     if (b !== bloco) { flushSelf(); pend = []; bloco = b; cc = idCC(kcc, rawCC); mi = m; mesesSet.add(m); }
     if (k === 'TOTAL CBZ') { add(cc, mi, 'B', -1, -1, real, orc); continue; }
-    if (/^(CUSTO|RECEITA)/.test(k) || IGNORAR.has(k)) continue;
+    if (/^(CUSTO|RECEITA)/.test(k) || IGNORAR.has(k) || /^DESEMPENHO OPERACIONAL/.test(k)) continue;
     var item = { k: k, raw: rawP, real: real, orc: orc };
     if (k === 'TOTAL OBZ') { flushSelf(); pend = []; add(cc, mi, 'T', -1, -1, real, orc); continue; }
     if (SELF.has(k)) {
@@ -685,7 +687,7 @@ function lerJustificativas(planilhas, ccs, mesPadrao) {
     $('tb-pac').innerHTML = tp;
     $('pac-sub').textContent = (S.cc < 0 ? 'Todos os centros de custo' : b.ccs[S.cc]) + ' ' + emPeriodo() + '. Abra um pacote para ver as contas.';
     var notas = [];
-    if (fora.length) notas.push('As linhas em cinza abaixo do total (como Depreciação e Amortização) existem na base, mas não entram no Total OBZ.');
+    if (fora.length) notas.push('As linhas em cinza abaixo do total (como Rateio) existem na base, mas não entram no Total OBZ.');
     if (cbz[0] || cbz[1]) notas.push('Fora do OBZ, os custos (Total CBZ) somam ' + f0(cbz[0]) + ' de realizado contra ' + f0(cbz[1]) + ' de orçado neste recorte.');
     $('pac-nota').textContent = notas.join(' ');
 
