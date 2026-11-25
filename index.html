@@ -163,6 +163,15 @@ dialog .acoes .btn{margin-top:0}
 .aviso-leve{background:var(--semola-soft);padding:8px 12px;border-radius:8px;font-size:.875rem}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;z-index:20;max-width:calc(100vw - 32px)}
 .toast[hidden]{display:none}
+.portao{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+.portao[hidden]{display:none}
+.portao form{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px 24px;width:min(380px,100%)}
+.portao h1{font-family:var(--display);font-size:1.6rem;margin:0 0 4px;letter-spacing:-.01em}
+.portao p{color:var(--muted);margin:0 0 18px;font-size:.9rem}
+.portao input{width:100%;border:1px solid var(--line);background:var(--bg);padding:10px 12px;border-radius:10px}
+.portao .btn{width:100%;justify-content:center;margin-top:14px}
+.portao .erro{margin:10px 0 0;font-size:.875rem}
+body.trancado .wrap{display:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:760px){
   .resultado{grid-template-columns:1fr}
@@ -177,7 +186,17 @@ dialog .acoes .btn{margin-top:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
-<body>
+<body class="trancado">
+<div class="portao" id="portao">
+  <form id="form-senha" autocomplete="off">
+    <h1>Controle orçamentário</h1>
+    <p>Diretoria de Jornada dos Franqueados. Digite a senha de acesso.</p>
+    <label class="sr" for="senha">Senha</label>
+    <input type="password" id="senha" placeholder="Senha" autofocus>
+    <button class="btn" type="submit">Entrar</button>
+    <p class="erro" id="senha-erro" hidden>Senha incorreta. Tente de novo.</p>
+  </form>
+</div>
 <div class="wrap">
   <header class="topo">
     <div>
@@ -283,6 +302,35 @@ dialog .acoes .btn{margin-top:0}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+/* ===== Senha de acesso =====
+   Para trocar a senha: gere o SHA-256 da nova senha (ex.: em https://emn178.github.io/online-tools/sha256.html)
+   e cole o resultado em SENHA_HASH. */
+var SENHA_HASH = 'b2ec895f9681fd5271259f936df64f708336626c9cb9e120d5755f7b8771773c';
+var _liberado = false, _aoLiberar = [];
+function aoLiberar(fn) { if (_liberado) fn(); else _aoLiberar.push(fn); }
+function _abrir() {
+  _liberado = true; document.body.classList.remove('trancado'); document.getElementById('portao').hidden = true;
+  try { sessionStorage.setItem('painel-ok', SENHA_HASH); } catch (e) {}
+  _aoLiberar.splice(0).forEach(function (fn) { fn(); });
+}
+function _hash(txt) {
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt)).then(function (b) {
+    return Array.from(new Uint8Array(b)).map(function (x) { return x.toString(16).padStart(2, '0'); }).join('');
+  });
+}
+document.addEventListener('DOMContentLoaded', function () {
+  var ok = null; try { ok = sessionStorage.getItem('painel-ok'); } catch (e) {}
+  if (ok === SENHA_HASH) { _abrir(); return; }
+  document.getElementById('form-senha').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var campo = document.getElementById('senha');
+    _hash(campo.value).then(function (hx) {
+      if (hx === SENHA_HASH) _abrir();
+      else { document.getElementById('senha-erro').hidden = false; campo.value = ''; campo.focus(); }
+    });
+  });
+});
+
 /* ===== Leitura da aba BASE (DRE) ===== */
 var MESES_K = ['JANEIRO','FEVEREIRO','MARCO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
 var MESES_NOME = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -973,7 +1021,7 @@ function lerJustificativas(planilhas, ccs, mesPadrao) {
   /* ----- carga da base ----- */
   if (MODO === 'site') {
     var ARQ = 'base.xlsx', modif = null;
-    fetch(ARQ, { cache: 'no-store' }).then(function (r) {
+    aoLiberar(function () { fetch(ARQ, { cache: 'no-store' }).then(function (r) {
       if (!r.ok) throw new Error('sem base');
       modif = r.headers.get('last-modified');
       return r.arrayBuffer();
@@ -982,7 +1030,7 @@ function lerJustificativas(planilhas, ccs, mesPadrao) {
       var base = lerPlanilha(new Uint8Array(buf), ARQ);
       if (modif && !isNaN(Date.parse(modif))) base.em = new Date(modif).toISOString();
       if (!S.base) carregar(base, false);
-    }).catch(function () { if (!S.base) desenhar(); });
+    }).catch(function () { if (!S.base) desenhar(); }); });
     return;
   }
   var espera = setTimeout(function () { if (!S.base) desenhar(); }, 10000);
