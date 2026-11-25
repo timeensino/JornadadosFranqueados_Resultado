@@ -257,7 +257,7 @@ dialog .acoes .btn{margin-top:0}
       <h2 id="h-just">Justificativas de estouro e saving</h2>
       <p class="sub" id="just-sub"></p>
       <div class="jfiltros">
-        <label class="campo"><span>Pacote</span><select id="just-pac"></select></label>
+        <label class="campo"><span>Grupo de despesa</span><select id="just-pac"></select></label>
         <label class="campo"><span>Buscar no texto</span><input type="search" id="just-busca" placeholder="Ex.: Enabley, viagem, multa"></label>
       </div>
       <div class="just-grid" id="just"></div>
@@ -783,14 +783,17 @@ function lerJustificativas(planilhas, ccs, mesPadrao) {
     var v = real - orc;
     return v >= 0.5 ? ' pos' : v <= -0.5 ? ' neg' : '';
   }
+  // em qual grupo do slide (G&A, Vendas…) cai o pacote citado na justificativa
+  var GRUPO_PAC = {};
+  GRUPOS.forEach(function (g) { g.pacs.forEach(function (p) { GRUPO_PAC[compacto(p)] = g.nome; }); });
+  function grupoDoPac(nome) { return GRUPO_PAC[chavePac(nome)] || ''; }
   function desenharJust() {
     var b = S.base, porCC = S.porCC || {}, q = norm(S.jBusca), varPac = variacoesPac();
     var base = S.just.filter(function (e) { return perOk(e[0]) && (S.cc < 0 || e[1] === S.cc) && (e[1] < b.ccs.length); });
-    var pacs = Array.from(new Set(base.map(function (e) { return e[2]; }))).sort(function (x, y) { return x.localeCompare(y, 'pt-BR'); });
-    if (S.jPac && pacs.indexOf(S.jPac) < 0) S.jPac = '';
-    $('just-pac').innerHTML = '<option value="">Todos os pacotes</option>' + pacs.map(function (p) { return '<option' + (p === S.jPac ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join('');
+    var OPC = [['', 'Todas as justificativas'], ['G&A', 'Despesas de G&A'], ['Vendas', 'Vendas']];
+    $('just-pac').innerHTML = OPC.map(function (o) { return '<option value="' + esc(o[0]) + '"' + (o[0] === S.jPac ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('');
     var lista = base.filter(function (e) {
-      if (S.jPac && e[2] !== S.jPac) return false;
+      if (S.jPac && grupoDoPac(e[2]) !== S.jPac) return false;
       if (!q) return true;
       return norm(e[2] + ' ' + e[3] + ' ' + e[4].map(function (l) { return l[1]; }).join(' ')).indexOf(q) >= 0;
     });
