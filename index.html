@@ -97,6 +97,15 @@ tr.sel td{background:var(--soft)}
 .abre[aria-expanded="true"] .seta{transform:rotate(90deg)}
 tr.conta td{background:var(--bg);font-size:.85rem;padding-top:7px;padding-bottom:7px}
 tr.conta td:first-child{padding-left:38px}
+tr.desp td{font-weight:700;background:var(--soft);border-bottom:2px solid var(--ink);font-size:.95rem}
+tr.grp td{background:var(--soft);font-weight:700;border-top:1px solid var(--line)}
+td b.semconta{font-weight:600;padding-left:calc(.7em + 8px)}
+tr.grp .abre,tr.grp b{font-weight:700}
+tr.filho td:first-child{padding-left:30px}
+tr.filho .abre,tr.filho b.semconta{font-weight:400}
+tr.conta.neto td:first-child{padding-left:62px}
+tr.fora.primeiro td{border-top:2px solid var(--line)}
+.grp-nota{display:block;font-size:.75rem;font-weight:400;color:var(--muted);padding-left:calc(.7em + 8px)}
 td.regua-c{min-width:170px;width:22%}
 .regua{position:relative;height:14px;background:var(--soft);border-radius:3px}
 .regua i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--basil)}
@@ -162,6 +171,8 @@ dialog .acoes .btn{margin-top:0}
   th,td{padding:9px 10px}
   th:first-child,td:first-child{min-width:132px}
   tr.conta td:first-child{padding-left:26px}
+  tr.filho td:first-child{padding-left:20px}
+  tr.conta.neto td:first-child{padding-left:40px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -235,7 +246,7 @@ dialog .acoes .btn{margin-top:0}
       <p class="sub" id="pac-sub"></p>
       <div class="painel rolagem">
         <table>
-          <thead><tr><th>Pacote</th><th class="num">Orçado</th><th class="num">Realizado</th><th class="num">Variação</th><th class="num">%</th></tr></thead>
+          <thead><tr><th>Pacote</th><th class="num">Realizado</th><th class="num">Orçado</th><th class="num">Variação</th><th class="num">%</th></tr></thead>
           <tbody id="tb-pac"></tbody>
         </table>
       </div>
@@ -278,7 +289,16 @@ var MESES_NOME = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho',
 var PKG = new Set(['PESSOAL','OCUPACAO E GASTOS ESTRUTURAIS','MANUTENCAO E ALUGUEL DE MAQUINAS E EQUIPAMENTOS','INFORMATICA E TELECOM','TERCEIROS','UTILIDADES','CONSUMO E LIMPEZA','LOCOMOCAO E ALIMENTACAO','MARKETING','JURIDICAS','DESPESAS TRIBUTARIAS','DESPESAS GERAIS']);
 var SELF = new Set(['FRETES E CARRETOS','DEPRECIACAO E AMORTIZACAO','RESULTADO DE EQUIVALENCIA PATRIMONIAL','RATEIO']);
 var FORA = new Set(['DEPRECIACAO E AMORTIZACAO','RESULTADO DE EQUIVALENCIA PATRIMONIAL','RATEIO']); // pacotes que não entram no Total OBZ
-var IGNORAR = new Set(['LUCRO BRUTO','DESEMPENHO OPERACIONAL','IMPOSTOS SOBRE VENDAS']);
+// grupos da tabela "Pacotes e contas", na ordem do slide. Grupo com mais de um pacote vira uma linha de soma.
+var GRUPOS = [
+  { nome: 'Pessoal', pacs: ['PESSOAL'] },
+  { nome: 'G&A', nota: 'Gerais e administrativas', pacs: ['OCUPACAO E GASTOS ESTRUTURAIS', 'LOCOMOCAO E ALIMENTACAO', 'INFORMATICA E TELECOM', 'UTILIDADES', 'MANUTENCAO E ALUGUEL DE MAQUINAS E EQUIPAMENTOS', 'CONSUMO E LIMPEZA', 'TERCEIROS'] },
+  { nome: 'Vendas', pacs: ['FRETES E CARRETOS', 'MARKETING'] },
+  { nome: 'Jurídicas e Contingências', pacs: ['JURIDICAS'] },
+  { nome: 'Despesas Tributárias', pacs: ['DESPESAS TRIBUTARIAS'] },
+  { nome: 'Despesas Gerais', pacs: ['DESPESAS GERAIS'] }
+];
+var IGNORAR =new Set(['LUCRO BRUTO','DESEMPENHO OPERACIONAL','IMPOSTOS SOBRE VENDAS']);
 var ESCONDER = /^(DEPRECIACAO E AMORTIZACAO|DESEMPENHO OPERACIONAL)/; // linhas que não aparecem no painel
 
 function norm(s) {
@@ -671,23 +691,40 @@ function lerJustificativas(planilhas, ccs, mesPadrao) {
     var dentro = chaves.filter(function (k) { return pac[k][2] === 'P'; }).sort(function (a, c) { return Math.abs(pac[c][0]) + Math.abs(pac[c][1]) - Math.abs(pac[a][0]) - Math.abs(pac[a][1]); });
     var fora = chaves.filter(function (k) { return pac[k][2] === 'N'; });
     var tp = '';
-    function linhaPac(k, extra) {
-      var x = pac[k], vv = x[0] - x[1], cs = contas[k] || {}, ids = Object.keys(cs).map(Number), aberto = S.abertos.has(k);
-      var nome = ids.length ? '<button class="abre" type="button" data-pac="' + k + '" aria-expanded="' + aberto + '"><span class="seta" aria-hidden="true">▸</span>' + esc(b.nomes[k]) + '</button>' : '<b style="font-weight:600;padding-left:calc(.7em + 8px)">' + esc(b.nomes[k]) + '</b>';
-      var r = '<tr class="' + extra + '"><td>' + nome + '</td><td class="num">' + f0(x[1]) + '</td><td class="num">' + f0(x[0]) + '</td><td class="num ' + cls(vv) + '">' + sinal(vv) + '</td><td class="num ' + cls(vv) + '">' + fpct(pct(vv, x[1])) + '</td></tr>';
+    function celulas(real, orc) {
+      var w = real - orc;
+      return '<td class="num">' + f0(real) + '</td><td class="num">' + f0(orc) + '</td><td class="num ' + cls(w) + '">' + sinal(w) + '</td><td class="num ' + cls(w) + '">' + fpct(pct(w, orc)) + '</td>';
+    }
+    function linhaPac(k, extra, rotulo) {
+      var x = pac[k], cs = contas[k] || {}, ids = Object.keys(cs).map(Number), aberto = S.abertos.has(k), txt = esc(rotulo || b.nomes[k]);
+      var nome = ids.length ? '<button class="abre" type="button" data-pac="' + k + '" aria-expanded="' + aberto + '"><span class="seta" aria-hidden="true">▸</span>' + txt + '</button>' : '<b class="semconta">' + txt + '</b>';
+      var r = '<tr class="' + extra + '"><td>' + nome + '</td>' + celulas(x[0], x[1]) + '</tr>';
+      var neto = /filho/.test(extra) ? ' neto' : '';
       if (aberto) ids.sort(function (a, c) { return Math.abs(cs[c][0]) + Math.abs(cs[c][1]) - Math.abs(cs[a][0]) - Math.abs(cs[a][1]); }).forEach(function (n) {
-        var y = cs[n], w = y[0] - y[1];
-        r += '<tr class="conta"><td>' + esc(b.nomes[n]) + '</td><td class="num">' + f0(y[1]) + '</td><td class="num">' + f0(y[0]) + '</td><td class="num ' + cls(w) + '">' + sinal(w) + '</td><td class="num ' + cls(w) + '">' + fpct(pct(w, y[1])) + '</td></tr>';
+        var y = cs[n];
+        r += '<tr class="conta' + neto + '"><td>' + esc(b.nomes[n]) + '</td>' + celulas(y[0], y[1]) + '</tr>';
       });
       return r;
     }
-    dentro.forEach(function (k) { tp += linhaPac(k, ''); });
-    tp += '<tr class="total"><td>Total OBZ</td><td class="num">' + f0(tot[1]) + '</td><td class="num">' + f0(tot[0]) + '</td><td class="num ' + cls(v) + '">' + sinal(v) + '</td><td class="num ' + cls(v) + '">' + fpct(p) + '</td></tr>';
-    fora.forEach(function (k) { tp += linhaPac(k, 'fora'); });
+    // organização igual à do slide: Despesas no topo e grupos de pacotes
+    var porNome = {}, usados = new Set();
+    dentro.forEach(function (k) { porNome[norm(b.nomes[k])] = k; });
+    tp += '<tr class="desp"><td>Despesas <span style="font-weight:400;color:var(--muted)">(Total OBZ)</span></td>' + celulas(tot[0], tot[1]) + '</tr>';
+    GRUPOS.forEach(function (g) {
+      var ks = g.pacs.map(function (nk) { return porNome[nk]; }).filter(function (k) { return k !== undefined; });
+      if (!ks.length) return;
+      ks.forEach(function (k) { usados.add(k); });
+      if (g.pacs.length === 1) { tp += linhaPac(ks[0], 'grp', g.nome); return; }
+      var sr = 0, so = 0; ks.forEach(function (k) { sr += pac[k][0]; so += pac[k][1]; });
+      tp += '<tr class="grp"><td><b style="padding-left:calc(.7em + 8px)">' + esc(g.nome) + '</b>' + (g.nota ? '<span class="grp-nota">' + esc(g.nota) + '</span>' : '') + '</td>' + celulas(sr, so) + '</tr>';
+      ks.forEach(function (k) { tp += linhaPac(k, 'filho'); });
+    });
+    dentro.forEach(function (k) { if (!usados.has(k)) tp += linhaPac(k, 'grp'); }); // pacote novo que ainda não está em nenhum grupo
+    fora.forEach(function (k, i) { tp += linhaPac(k, 'fora' + (i ? '' : ' primeiro')); });
     $('tb-pac').innerHTML = tp;
-    $('pac-sub').textContent = (S.cc < 0 ? 'Todos os centros de custo' : b.ccs[S.cc]) + ' ' + emPeriodo() + '. Abra um pacote para ver as contas.';
-    var notas = [];
-    if (fora.length) notas.push('As linhas em cinza abaixo do total (como Rateio) existem na base, mas não entram no Total OBZ.');
+    $('pac-sub').textContent = (S.cc < 0 ? 'Todos os centros de custo' : b.ccs[S.cc]) + ' ' + emPeriodo() + ', na mesma organização do slide. Abra um pacote para ver as contas.';
+    var notas = ['G&A soma Ocupação, Locomoção e Alimentação, Informática, Utilidades, Manutenção, Consumo e Limpeza e Terceiros. Vendas soma Fretes e Carretos e Marketing.'];
+    if (fora.length) notas.push('As linhas em cinza no fim (como Rateio) existem na base, mas não entram no total de Despesas.');
     if (cbz[0] || cbz[1]) notas.push('Fora do OBZ, os custos (Total CBZ) somam ' + f0(cbz[0]) + ' de realizado contra ' + f0(cbz[1]) + ' de orçado neste recorte.');
     $('pac-nota').textContent = notas.join(' ');
 
