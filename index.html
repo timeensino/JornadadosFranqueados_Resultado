@@ -142,7 +142,6 @@ td.regua-c{min-width:170px;width:22%}
 .jv{font-weight:600;color:var(--muted);white-space:nowrap}
 .jv.pos{color:var(--basil)} .jv.neg{color:var(--tomato)}
 .jtxt .jb{font-weight:600;margin-top:8px}
-.jtxt .jconta{font-weight:600} .jtxt .jconta.pos{color:var(--basil)} .jtxt .jconta.neg{color:var(--tomato)}
 .jvazio{color:var(--muted);margin:0;padding:18px;border:1px dashed var(--line);border-radius:14px;max-width:70ch}
 details.confere{margin-top:40px;background:var(--semola-soft);border-radius:14px;padding:14px 18px}
 details.confere summary{cursor:pointer;font-weight:600}
@@ -784,58 +783,12 @@ function lerJustificativas(planilhas, ccs, mesPadrao) {
     var v = real - orc;
     return v >= 0.5 ? ' pos' : v <= -0.5 ? ' neg' : '';
   }
-  // cor das linhas que citam uma conta da DRE (ex.: "Lanches e Refeições: R$ 16.129,00")
-  var LIGA = new Set(['E', 'DE', 'DA', 'DO', 'DOS', 'DAS', 'COM', 'PARA']);
-  function chaveConta(x) {
-    return norm(x).replace(/^[\d.\s\-–]+/, '').split(/[^A-Z0-9&]+/).filter(function (w) { return w && !LIGA.has(w); })
-      .map(function (w) { return w.length > 3 ? w.replace(/S$/, '') : w; }).join('');
-  }
-  function variacoesConta() {
-    var mapa = {}, nomes = S.base.nomes || [], lista = new Set();
-    S.linhas.forEach(function (l) {
-      if (l[2] !== 'C') return;
-      var kc = chaveConta(nomes[l[3]] || ''); if (!kc) return;
-      lista.add(kc);
-      var kp = chavePac(nomes[l[4]] || '');
-      [l[0], -1].forEach(function (cc) {
-        [kp, ''].forEach(function (p) {
-          var k = cc + '|' + l[1] + '|' + p + '|' + kc, a = mapa[k] || (mapa[k] = [0, 0]);
-          a[0] += l[5]; a[1] += l[6];
-        });
-      });
-    });
-    return { mapa: mapa, lista: Array.from(lista), cache: {} };
-  }
-  function acharConta(vc, txt) {
-    var i = txt.indexOf('R$'); if (i <= 0) return '';
-    var pre = txt.slice(0, i).replace(/[\s:\-–—]+$/, '');
-    if (!pre || pre.length > 60) return '';
-    var kc = chaveConta(pre); if (kc.length < 4) return '';
-    if (vc.cache[kc] !== undefined) return vc.cache[kc];
-    var achou = vc.lista.indexOf(kc) >= 0 ? kc : '';
-    if (!achou) vc.lista.forEach(function (a) {
-      if (Math.min(a.length, kc.length) >= 5 && (a.indexOf(kc) >= 0 || kc.indexOf(a) >= 0) && (!achou || Math.abs(a.length - kc.length) < Math.abs(achou.length - kc.length))) achou = a;
-    });
-    return (vc.cache[kc] = achou);
-  }
-  function corConta(vc, e, txt) {
-    var kc = acharConta(vc, txt); if (!kc) return '';
-    var ms = e[0] === 12 ? [0, 1, 2, 3, 4, 5] : e[0] === 13 ? [6, 7, 8, 9, 10, 11] : [e[0]], kp = chavePac(e[2]);
-    function soma(p) {
-      var real = 0, orc = 0, ok = false;
-      ms.forEach(function (m) { var a = vc.mapa[e[1] + '|' + m + '|' + p + '|' + kc]; if (a) { ok = true; real += a[0]; orc += a[1]; } });
-      return ok ? real - orc : null;
-    }
-    var v = soma(kp); if (v === null) v = soma('');
-    if (v === null) return '';
-    return v >= 0.5 ? ' pos' : v <= -0.5 ? ' neg' : '';
-  }
   // em qual grupo do slide (G&A, Vendas…) cai o pacote citado na justificativa
   var GRUPO_PAC = {};
   GRUPOS.forEach(function (g) { g.pacs.forEach(function (p) { GRUPO_PAC[compacto(p)] = g.nome; }); });
   function grupoDoPac(nome) { return GRUPO_PAC[chavePac(nome)] || ''; }
   function desenharJust() {
-    var b = S.base, porCC = S.porCC || {}, q = norm(S.jBusca), varPac = variacoesPac(), varConta = variacoesConta();
+    var b = S.base, porCC = S.porCC || {}, q = norm(S.jBusca), varPac = variacoesPac();
     var base = S.just.filter(function (e) { return perOk(e[0]) && (S.cc < 0 || e[1] === S.cc) && (e[1] < b.ccs.length); });
     var OPC = [['', 'Todas as justificativas'], ['G&A', 'Despesas de G&A'], ['Vendas', 'Vendas']];
     $('just-pac').innerHTML = OPC.map(function (o) { return '<option value="' + esc(o[0]) + '"' + (o[0] === S.jPac ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('');
@@ -864,9 +817,7 @@ function lerJustificativas(planilhas, ccs, mesPadrao) {
         h += '<h4>' + esc(e[2]) + (e[3] ? ' <span class="jv num' + corPac(varPac, e) + '">' + esc(e[3]) + '</span>' : '') + '</h4>';
         e[4].forEach(function (ln) {
           var t = ln[0], s = esc(ln[1]);
-          var cor = (t === 'p' || t === 'b') ? corConta(varConta, e, ln[1]) : '';
-          if (cor) { h += '<p class="jconta' + cor + '">' + s + '</p>'; return; }
-          h +=t === 's' ? '<p class="jsub">' + s + '</p>' : t === 'b' ? '<p class="jb">' + s + '</p>' : t === 'v' ? '<p class="jval num">' + s + '</p>' : '<p>' + s + '</p>';
+          h += t === 's' ? '<p class="jsub">' + s + '</p>' : t === 'b' ? '<p class="jb">' + s + '</p>' : t === 'v' ? '<p class="jval num">' + s + '</p>' : '<p>' + s + '</p>';
         });
       });
       h += '</div>';
@@ -1006,53 +957,4 @@ function lerJustificativas(planilhas, ccs, mesPadrao) {
   }
   $('dlg-cancelar').addEventListener('click', function () { S.pendente = null; dlg.close(); });
   $('dlg-ok').addEventListener('click', function () {
-    var base = S.pendente; if (!base) return;
-    if (!S.db) { dlg.close(); carregar(base, true); toast('Base carregada nesta tela'); return; }
-    $('dlg-ok').disabled = true; $('dlg-ok').textContent = 'Publicando…';
-    if (!S.local) mesclarHist(base, S.base);
-    S.db.doc('painel/atual').set(base).then(function () {
-      S.pendente = null; dlg.close(); carregar(base, false); toast('Base publicada');
-    }).catch(function (er) {
-      var semPermissao = er && er.code === 'invalid_argument';
-      dlgEstado('A base não foi publicada', '<p class="erro">' + (semPermissao ? 'Seu acesso a este painel não permite trocar a base. Peça a quem é dono ou editor.' : 'O armazenamento do painel não respondeu. Tente de novo em instantes.') + '</p>', !semPermissao);
-    });
-  });
-  var tt; function toast(msg) { var t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(function () { t.hidden = true; }, 3200); }
-
-  /* ----- carga da base ----- */
-  if (MODO === 'site') {
-    var ARQ = 'base.xlsx', modif = null;
-    fetch(ARQ, { cache: 'no-store' }).then(function (r) {
-      if (!r.ok) throw new Error('sem base');
-      modif = r.headers.get('last-modified');
-      return r.arrayBuffer();
-    }).then(function (buf) {
-      if (typeof XLSX === 'undefined') throw new Error('sem leitor');
-      var base = lerPlanilha(new Uint8Array(buf), ARQ);
-      if (modif && !isNaN(Date.parse(modif))) base.em = new Date(modif).toISOString();
-      if (!S.base) carregar(base, false);
-    }).catch(function () { if (!S.base) desenhar(); });
-    return;
-  }
-  var espera = setTimeout(function () { if (!S.base) desenhar(); }, 10000);
-  function semDb() { clearTimeout(espera); if (!S.base) desenhar(); }
-  if (!window.claude || typeof window.claude.use !== 'function') { semDb(); return; }
-  Promise.all([window.claude.use('db'), window.claude.use('user')]).then(function (r) {
-    var db = r[0], user = r[1];
-    if (user && typeof user.canEdit === 'function') {
-      Promise.resolve(user.canEdit()).then(function (ok) { if (ok === false) { S.podeEnviar = false; if ($('carregando').hidden) desenhar(); } }).catch(function () {});
-    }
-    if (!db) { semDb(); return; }
-    S.db = db;
-    db.doc('painel/atual').onSnapshot(function (snap) {
-      clearTimeout(espera);
-      var d = snap.exists ? snap.data() : null;
-      if (d && d.linhas && (!S.base || S.local || d.em !== S.base.em || d.just !== S.base.just)) carregar(d, false);
-      else if (!S.base) desenhar();
-    }, function () { semDb(); });
-  }).catch(semDb);
-})();
-
-</script>
-</body>
-</html>
+    var base = S.pendente
